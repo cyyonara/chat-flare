@@ -35,7 +35,9 @@ export const googleSignUpSchema = z
   })
   .strict();
 
-export const setupSchema = googleSignUpSchema.pick({ avatar: true });
+export const googleLoginSchema = googleSignUpSchema.pick({ email: true }).strict();
+
+export const setupSchema = googleSignUpSchema.pick({ avatar: true }).strict();
 
 export const createChatSchema = z
   .object({

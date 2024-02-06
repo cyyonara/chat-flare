@@ -1,8 +1,8 @@
-import { IRequest } from "../utils/types";
+import { IRequest } from "../lib/types";
 import { Response, NextFunction } from "express";
 import User from "../models/userModel";
 import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
-import { ITokenPayload } from "../utils/types";
+import { ITokenPayload } from "../lib/types";
 import expressAsyncHandler from "express-async-handler";
 import { MongooseError } from "mongoose";
 

@@ -1,11 +1,12 @@
 import { Response } from "express";
-import { IRequest } from "../utils/types";
+import { IRequest } from "../lib/types";
 import User from "../models/userModel";
 import expressAsyncHandler from "express-async-handler";
 import { fromZodError } from "zod-validation-error";
 import { ZodError } from "zod";
-import { setupSchema } from "../utils/validations";
+import { setupSchema } from "../lib/validations";
 
+// @PUT - private - /api/user/account/setup
 export const setupAccount = expressAsyncHandler(
   async (req: IRequest, res: Response): Promise<void> => {
     try {

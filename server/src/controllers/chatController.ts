@@ -2,11 +2,11 @@ import Chat from "../models/chatModel";
 import Message from "../models/messageModel";
 import User from "../models/userModel";
 import { Response } from "express";
-import { IRequest } from "../utils/types";
+import { IRequest } from "../lib/types";
 import expressAsyncHandler from "express-async-handler";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { createChatSchema } from "../utils/validations";
+import { createChatSchema } from "../lib/validations";
 
 export const createChat = expressAsyncHandler(
   async (req: IRequest, res: Response): Promise<void> => {

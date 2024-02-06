@@ -4,8 +4,14 @@ import User from "../models/userModel";
 import { Request, Response } from "express";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { signUpSchema, loginSchema, googleSignUpSchema } from "../utils/validations";
+import {
+  signUpSchema,
+  loginSchema,
+  googleSignUpSchema,
+  googleLoginSchema,
+} from "../lib/validations";
 
+// @POST - public - /api/auth/login
 export const login = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
@@ -59,6 +65,7 @@ export const login = expressAsyncHandler(
   }
 );
 
+// @POST - public - /api/auth/signup
 export const signUp = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
@@ -116,9 +123,38 @@ export const signUp = expressAsyncHandler(
   }
 );
 
+// @POST - public - /api/auth/google/login
 export const googleLogin = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
+      const { email } = googleLoginSchema.parse(req.body);
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        res.status(400);
+        throw new Error("Email isn't connected to an account. Try to sign up first");
+      }
+
+      const token: string = user.generateToken();
+      res
+        .status(200)
+        .cookie("cfAuth", token, {
+          path: "/",
+          httpOnly: true,
+          maxAge: 60 * (1000 * 60 * 60 * 24),
+          sameSite: process.env.NODE_ENV === "dev" ? "lax" : "none",
+          secure: process.env.NODE_ENV !== "dev",
+        })
+        .json({
+          success: true,
+          data: {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+          },
+          message: "Login success",
+        });
     } catch (error: any) {
       let errorMessage: string;
 
@@ -134,6 +170,7 @@ export const googleLogin = expressAsyncHandler(
   }
 );
 
+// @POST - public - /api/auth/google/signup
 export const googleSignUp = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
