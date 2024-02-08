@@ -2,13 +2,14 @@ import React from "react";
 import hero from "@/assets/Messaging-pana.png";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/states/useAuth";
+import { AnimatePresence } from "framer-motion";
 
 const AuthLayout: React.FC = () => {
   const user = useAuth((state) => state.user);
 
   return (
     <div className="flex h-screen">
-      <div className="hidden flex-[2] items-center justify-center p-6 lg:flex">
+      <div className="hidden flex-[2] items-center justify-center border-r p-6 lg:flex">
         <div className="flex max-w-[1000px] flex-1 flex-col items-center gap-y-10">
           <h1 className="text-4xl font-bold">Chat Flare</h1>
           <div className="flex flex-col items-center">
@@ -26,7 +27,11 @@ const AuthLayout: React.FC = () => {
           </div>
         </div>
       </div>
-      {user ? <Navigate to="/chats" replace={true} /> : <Outlet />}
+      <div className="flex flex-1 items-center justify-center p-5">
+        <AnimatePresence>
+          {user ? <Navigate to="/chats" replace={true} /> : <Outlet />}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default:
-        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vecteezy.com%2Fvector-art%2F4819327-male-avatar-profile-icon-of-smiling-caucasian-man&psig=AOvVaw3vcky0viNQB55WUEqBf0DV&ust=1707099150274000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCOCX8YXOkIQDFQAAAAAdAAAAABAJ",
+        "https://firebasestorage.googleapis.com/v0/b/school-9c7f7.appspot.com/o/tic-talk%2FdefaultAvatar.png?alt=media&token=1c88256c-cd60-46f9-9e13-98027da79a6a",
     },
     password: {
       type: String,

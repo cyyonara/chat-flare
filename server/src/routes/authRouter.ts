@@ -1,5 +1,5 @@
 import express from "express";
-import { googleLogin, googleSignUp, login, signUp } from "../controllers/authController";
+import { googleLogin, googleSignup, login, signup } from "../controllers/authController";
 
 const router = express.Router();
 
@@ -7,12 +7,12 @@ const router = express.Router();
 router.post("/login", login);
 
 // @POST - public - /api/auth/signup
-router.post("/sign-up", signUp);
+router.post("/signup", signup);
 
 // @POST - public - /api/auth/google/login
 router.post("/google/login", googleLogin);
 
 // @POST - public - /api/auth/google/signup
-router.post("/google/sign-up", googleSignUp);
+router.post("/google/signup", googleSignup);
 
 export default router;

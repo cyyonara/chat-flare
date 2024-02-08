@@ -66,7 +66,7 @@ export const login = expressAsyncHandler(
 );
 
 // @POST - public - /api/auth/signup
-export const signUp = expressAsyncHandler(
+export const signup = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, username, password } = signUpSchema.parse(req.body);
@@ -90,7 +90,7 @@ export const signUp = expressAsyncHandler(
 
       const token: string = user.generateToken();
       res
-        .status(200)
+        .status(201)
         .cookie("cfAuth", token, {
           path: "/",
           httpOnly: true,
@@ -171,7 +171,7 @@ export const googleLogin = expressAsyncHandler(
 );
 
 // @POST - public - /api/auth/google/signup
-export const googleSignUp = expressAsyncHandler(
+export const googleSignup = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, username, avatar, password } = googleSignUpSchema.parse(req.body);
@@ -192,7 +192,7 @@ export const googleSignUp = expressAsyncHandler(
 
       const token: string = user.generateToken();
       res
-        .status(200)
+        .status(201)
         .cookie("cfAuth", token, {
           path: "/",
           httpOnly: true,

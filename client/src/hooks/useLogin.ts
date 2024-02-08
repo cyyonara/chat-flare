@@ -7,23 +7,24 @@ import {
 } from "@/lib/types";
 import axios from "axios";
 
-const login = async (
-  loginData: ILoginData,
-): Promise<IResponse<IUserCredential>> => {
-  const response = await axios.post<IResponse<IUserCredential>>(
+type TMutationResponse = IResponse<IUserCredential>;
+
+const login = async (loginData: ILoginData): Promise<TMutationResponse> => {
+  const response = await axios.post<TMutationResponse>(
     import.meta.env.VITE_API + "/api/auth/login",
     loginData,
+    { withCredentials: true },
   );
 
   return response.data;
 };
 
 export const useLogin = (): UseMutationResult<
-  IResponse<IUserCredential>,
+  TMutationResponse,
   IRequestError,
   ILoginData
 > => {
-  return useMutation<IResponse<IUserCredential>, IRequestError, ILoginData>({
+  return useMutation<TMutationResponse, IRequestError, ILoginData>({
     mutationKey: ["login"],
     mutationFn: login,
   });
