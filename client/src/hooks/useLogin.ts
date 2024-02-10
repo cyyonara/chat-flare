@@ -1,4 +1,8 @@
-import { UseMutationResult, useMutation } from "@tanstack/react-query";
+import {
+  UseMutationResult,
+  useMutation,
+  MutationFunction,
+} from "@tanstack/react-query";
 import {
   ILoginData,
   IRequestError,
@@ -9,7 +13,9 @@ import axios from "axios";
 
 type TMutationResponse = IResponse<IUserCredential>;
 
-const login = async (loginData: ILoginData): Promise<TMutationResponse> => {
+const login: MutationFunction<TMutationResponse, ILoginData> = async (
+  loginData,
+) => {
   const response = await axios.post<TMutationResponse>(
     import.meta.env.VITE_API + "/api/auth/login",
     loginData,

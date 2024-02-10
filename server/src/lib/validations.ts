@@ -45,10 +45,17 @@ export const createChatSchema = z
     isGroupChat: z.boolean(),
   })
   .strict()
-  .refine((data) => {
-    if (!data.isGroupChat) {
-      return data.people.length === 1;
-    }
+  .refine(
+    (data) => {
+      if (!data.isGroupChat) {
+        return data.people.length === 1;
+      }
 
-    return true;
-  });
+      return true;
+    },
+    {
+      message:
+        "Only 2 users are allowed when creating a new chat that is not a group chat",
+      path: ["people"],
+    }
+  );

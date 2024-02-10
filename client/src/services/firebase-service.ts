@@ -14,11 +14,18 @@ export const getGoogleCredential =
   async (): Promise<IGoogleCredentialReturn> => {
     try {
       const userCredential = await signInWithPopup(auth, googleProvider);
-      return { success: true, email: userCredential.user.email as string };
+
+      return {
+        success: true,
+        email: userCredential.user.email as string,
+        avatar: userCredential.user.photoURL as string,
+      };
     } catch (error: any) {
+      const { message }: FirebaseError = error;
+
       return {
         success: false,
-        message: error.message || "Something went wrong",
+        errorMessage: message,
       };
     }
   };
@@ -29,9 +36,16 @@ export const uploadImage = async (imageFile: File): Promise<IUploadImage> => {
     const result: UploadResult = await uploadBytes(storageRef, imageFile);
     const imageUrl = await getDownloadURL(result.ref);
 
-    return { success: true, imageUrl };
+    return {
+      success: true,
+      imageUrl,
+    };
   } catch (error: any) {
     const { message }: FirebaseError = error;
-    return { success: false, errorMessage: message };
+
+    return {
+      success: false,
+      errorMessage: message,
+    };
   }
 };

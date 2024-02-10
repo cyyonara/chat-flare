@@ -36,6 +36,6 @@ interface IUserModel extends InferSchemaType<typeof userSchema> {
   generateToken: () => string;
 }
 
-const User = mongoose.model<IUserModel>("user", userSchema);
+const User = mongoose.model<IUserModel>("User", userSchema);
 
 export default User;

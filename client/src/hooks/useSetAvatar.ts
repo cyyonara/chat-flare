@@ -1,11 +1,17 @@
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import {
+  MutationFunction,
+  useMutation,
+  UseMutationResult,
+} from "@tanstack/react-query";
 import { IResponse, IRequestError, IUserCredential } from "@/lib/types";
 import axios, { AxiosError } from "axios";
 import { uploadImage } from "@/services/firebase-service";
 
 type TMutationResponse = IResponse<IUserCredential>;
 
-const setAvatar = async (imageFile: File): Promise<TMutationResponse> => {
+const setAvatar: MutationFunction<TMutationResponse, File> = async (
+  imageFile,
+) => {
   const { success, imageUrl, errorMessage } = await uploadImage(imageFile);
 
   if (!success) throw new AxiosError(errorMessage);

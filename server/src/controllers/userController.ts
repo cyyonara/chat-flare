@@ -41,3 +41,27 @@ export const setupAccount = expressAsyncHandler(
     }
   }
 );
+
+// @GET - private - /api/user/search?keyword=?
+export const searchUser = expressAsyncHandler(
+  async (req: IRequest, res: Response): Promise<void> => {
+    const keyword = req.query.keyword;
+    const users = await User.find({
+      $and: [
+        { _id: { $ne: req.user?._id } },
+        {
+          $or: [
+            { username: { $regex: keyword, $options: "i" } },
+            { email: { $regex: keyword, $options: "i" } },
+          ],
+        },
+      ],
+    }).select("_id username email avatar");
+
+    res.status(200).json({
+      success: true,
+      data: users,
+      message: null,
+    });
+  }
+);

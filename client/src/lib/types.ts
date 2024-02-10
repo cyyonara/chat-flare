@@ -27,11 +27,34 @@ export interface ISignupData extends z.infer<typeof signupSchema> {}
 export interface IGoogleCredentialReturn {
   success: boolean;
   email?: string;
-  message?: string;
+  avatar?: string;
+  errorMessage?: string;
 }
 
 export interface IUploadImage {
   imageUrl?: string;
   success: boolean;
   errorMessage?: string;
+}
+
+export interface IMessage {
+  _id: string;
+  sender: IUserCredential;
+  isImage: boolean;
+  content: string;
+  receiver: IUserCredential[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IChat {
+  _id: string;
+  chatCreator: IUserCredential;
+  chatPhoto: string;
+  people: IUserCredential[];
+  isGroupChat: boolean;
+  groupName: string | null;
+  lastMessage: IMessage | null;
+  createdAt: string;
+  updatedAt: string;
 }

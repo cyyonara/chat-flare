@@ -6,13 +6,17 @@ import { IUserCredential } from "@/lib/types";
 import { CameraIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useSetAvatar } from "@/hooks/useSetAvatar";
+import { useAuth } from "@/states/useAuth";
 
 const AvatarSetup: React.FC = () => {
   const location = useLocation();
   const userCredential: IUserCredential = location.state;
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const inputFileRef = useRef<HTMLInputElement | null>(null);
+  const { mutate, isPending } = useSetAvatar();
+  const setCredential = useAuth((state) => state.setCredential);
   const { toast } = useToast();
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files[0]) {
@@ -26,6 +30,21 @@ const AvatarSetup: React.FC = () => {
           description: 'Only files of the type "image" are allowed',
         });
       }
+    }
+  };
+
+  const handleSetAvatar = (): void => {
+    if (imageFile) {
+      mutate(imageFile, {
+        onSuccess: (data) => setCredential(data.data),
+        onError: (error) =>
+          toast({
+            title: "Oops!",
+            description: error.response?.data.message || error.message,
+          }),
+      });
+    } else {
+      setCredential(userCredential);
     }
   };
 
@@ -47,10 +66,17 @@ const AvatarSetup: React.FC = () => {
       <h3 className="font-bold">Pick an avatar to use</h3>
       <div className="flex flex-col items-center gap-y-3">
         <div
-          onClick={() => inputFileRef.current?.click()}
+          onClick={() => {
+            if (!isPending) {
+              inputFileRef.current?.click();
+            }
+          }}
           className="relative h-[200px] w-[200px] cursor-pointer gap-y-4 rounded-full"
         >
-          <button className="absolute right-7 top-1 rounded-full bg-foreground p-[6px] text-primary-foreground duration-150 hover:bg-muted-foreground">
+          <button
+            disabled={isPending}
+            className="absolute right-7 top-1 rounded-full bg-foreground p-[6px] text-primary-foreground duration-150 hover:bg-muted-foreground"
+          >
             <CameraIcon size={20} />
           </button>
           <input
@@ -67,8 +93,8 @@ const AvatarSetup: React.FC = () => {
             className="h-[200px] w-[200px] rounded-full object-cover object-center"
           />
         </div>
-        <Button>
-          {false && <Loader2 size={20} />}
+        <Button disabled={isPending} onClick={handleSetAvatar}>
+          {isPending && <Loader2 size={20} />}
           <span>Finish</span>
         </Button>
       </div>

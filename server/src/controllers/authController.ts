@@ -179,7 +179,7 @@ export const googleSignup = expressAsyncHandler(
 
       if (isEmailExist) {
         res.status(400);
-        throw new Error("This email is already connected to an account");
+        throw new Error("Email is already connected to an account");
       }
 
       const hashedPassword: string = await bcrypt.hash(password, 10);

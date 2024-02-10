@@ -7,6 +7,10 @@ const messageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    isImage: {
+      type: String,
+      required: true,
+    },
     content: {
       type: String,
       required: true,

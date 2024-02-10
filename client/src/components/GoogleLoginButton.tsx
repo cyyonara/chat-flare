@@ -10,21 +10,18 @@ interface IProps {
 }
 
 const GoogleLoginButton: React.FC<IProps> = ({ isLoginPending }) => {
-  const loginWithGoogle = useLoginWithGoogle();
+  const { mutate, isPending } = useLoginWithGoogle();
   const { toast } = useToast();
   const setCredential = useAuth((state) => state.setCredential);
 
   const handleLoginWithGoogle = (): void => {
-    loginWithGoogle.mutate(null, {
-      onSuccess: (data) => {
-        setCredential(data.data);
-      },
-      onError: (error) => {
+    mutate(null, {
+      onSuccess: (data) => setCredential(data.data),
+      onError: (error) =>
         toast({
           title: "Oops",
           description: error.response?.data.message || error.message,
-        });
-      },
+        }),
     });
   };
 
@@ -32,7 +29,7 @@ const GoogleLoginButton: React.FC<IProps> = ({ isLoginPending }) => {
     <Button
       variant="outline"
       type="button"
-      disabled={isLoginPending || loginWithGoogle.isPending}
+      disabled={isLoginPending || isPending}
       onClick={handleLoginWithGoogle}
       className="flex items-center gap-x-2"
     >

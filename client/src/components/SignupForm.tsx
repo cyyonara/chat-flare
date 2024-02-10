@@ -28,24 +28,22 @@ const SignupForm: React.FC = () => {
     resolver: zodResolver(signupSchema),
     mode: "onSubmit",
   });
-  const signup = useSignup();
+  const { mutate, isPending } = useSignup();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSignup: SubmitHandler<SignupField> = (formData): void => {
-    signup.mutate(formData, {
-      onSuccess: (data): void => {
+    mutate(formData, {
+      onSuccess: (data) =>
         navigate("/setup", {
           state: data.data,
           replace: true,
-        });
-      },
-      onError: (error): void => {
+        }),
+      onError: (error) =>
         toast({
           title: "Oops!",
           description: error.response?.data.message || "Something went wrong",
-        });
-      },
+        }),
     });
   };
 
@@ -54,7 +52,7 @@ const SignupForm: React.FC = () => {
       onSubmit={handleSubmit(handleSignup)}
       className="flex w-full flex-col gap-y-4"
     >
-      <GoogleSignupButton isSignupPending={signup.isPending} />
+      <GoogleSignupButton isSignupPending={isPending} />
       <div className="flex items-center gap-x-4">
         <Separator className="flex-1" />
         <span className="text-sm text-muted-foreground">or</span>
@@ -71,7 +69,7 @@ const SignupForm: React.FC = () => {
           id="email"
           type="text"
           placeholder="Email"
-          disabled={signup.isPending}
+          disabled={isPending}
           {...register("email")}
         />
         {errors.email && (
@@ -89,7 +87,7 @@ const SignupForm: React.FC = () => {
           id="username"
           type="text"
           placeholder="Username"
-          disabled={signup.isPending}
+          disabled={isPending}
           {...register("username")}
         />
         {errors.username && (
@@ -106,10 +104,11 @@ const SignupForm: React.FC = () => {
         <InputWithIcon
           id="password"
           type={showPassword ? "text" : "password"}
+          placeholder="Password"
           icon={showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
           iconPosition="right"
           onIconClick={() => setShowPassword(!showPassword)}
-          disabled={signup.isPending}
+          disabled={isPending}
           {...register("password")}
         />
         {errors.password && (
@@ -126,10 +125,11 @@ const SignupForm: React.FC = () => {
         <InputWithIcon
           id="confirmPassword"
           type={showConfirmPassword ? "text" : "password"}
+          placeholder="Confirm Password"
           icon={showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
           iconPosition="right"
           onIconClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          disabled={signup.isPending}
+          disabled={isPending}
           {...register("confirmPassword")}
         />
         {errors.confirmPassword && (
@@ -138,8 +138,8 @@ const SignupForm: React.FC = () => {
           </p>
         )}
       </div>
-      <Button disabled={signup.isPending} className="flex items-center gap-x-2">
-        {signup.isPending && <Loader2 size={20} className="animate-spin" />}
+      <Button disabled={isPending} className="flex items-center gap-x-2">
+        {isPending && <Loader2 size={20} className="animate-spin" />}
         <span>Create Account</span>
       </Button>
       <p className="text-center text-sm">

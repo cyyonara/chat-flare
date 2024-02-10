@@ -25,21 +25,18 @@ const LoginForm: React.FC = () => {
     resolver: zodResolver(loginSchema),
     mode: "onSubmit",
   });
-  const login = useLogin();
+  const { mutate, isPending } = useLogin();
   const setCredential = useAuth((state) => state.setCredential);
   const { toast } = useToast();
 
   const handleLogin: SubmitHandler<LoginFields> = (formData): void => {
-    login.mutate(formData, {
-      onSuccess: (data): void => {
-        setCredential(data.data);
-      },
-      onError: (data): void => {
+    mutate(formData, {
+      onSuccess: (data) => setCredential(data.data),
+      onError: (error) =>
         toast({
           title: "Oops",
-          description: data.response?.data.message || "Something went wrong",
-        });
-      },
+          description: error.response?.data.message || "Something went wrong",
+        }),
     });
   };
 
@@ -54,7 +51,7 @@ const LoginForm: React.FC = () => {
           type="text"
           id="email"
           placeholder="Email"
-          disabled={login.isPending}
+          disabled={isPending}
           {...register("email")}
         />
         {errors.email && (
@@ -67,16 +64,16 @@ const LoginForm: React.FC = () => {
           type="password"
           id="password"
           placeholder="Password"
-          disabled={login.isPending}
+          disabled={isPending}
           {...register("password")}
         />
       </div>
       <Button
         type="submit"
-        disabled={login.isPending}
+        disabled={isPending}
         className="flex items-center gap-x-2"
       >
-        {login.isPending && <Loader2 size={20} className="animate-spin" />}
+        {isPending && <Loader2 size={20} className="animate-spin" />}
         <span>Login</span>
       </Button>
       <div className="flex items-center gap-x-4">
@@ -84,7 +81,7 @@ const LoginForm: React.FC = () => {
         <span className="text-sm text-muted-foreground">or</span>
         <Separator className="flex-1" />
       </div>
-      <GoogleLoginButton isLoginPending={login.isPending} />
+      <GoogleLoginButton isLoginPending={isPending} />
       <p className="text-center text-sm">
         Don't have an account?{" "}
         <Link to="/signup" className="font-medium hover:underline">

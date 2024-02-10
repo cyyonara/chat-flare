@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LoginForm from "@/components/LoginForm";
 import { motion } from "framer-motion";
 
 const Login: React.FC = () => {
+  useEffect(() => {
+    document.title = "Login";
+  }, []);
+
   return (
     <motion.div
       key="login"

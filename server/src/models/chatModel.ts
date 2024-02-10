@@ -19,6 +19,10 @@ const chatSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    groupName: {
+      type: String,
+      default: null,
+    },
     lastMessage: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
@@ -30,6 +34,6 @@ const chatSchema = new mongoose.Schema(
 
 interface IChatModel extends InferSchemaType<typeof chatSchema> {}
 
-const Chat = mongoose.model<IChatModel>("user", chatSchema);
+const Chat = mongoose.model<IChatModel>("Chat", chatSchema);
 
 export default Chat;
