@@ -2,6 +2,7 @@ import { IRequest } from '../utils/types';
 import { ITokenPayload } from '../utils/types';
 import { Response, NextFunction } from 'express';
 import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
+import { User } from '../models/userModel';
 import expressAsyncHandler from 'express-async-handler';
 
 export const verify = expressAsyncHandler(
@@ -13,22 +14,29 @@ export const verify = expressAsyncHandler(
           token,
           process.env.JWT_SECRET as string
         ) as ITokenPayload;
+
+        const user = await User.findById(_id);
+
+        if (!user) {
+          res.clearCookie('cfAuth').status(401);
+          throw new Error('User not found');
+        }
+
+        req.user = user;
+        next();
       } catch (error: any) {
         let errorMessage: string;
-        let status: number = 401;
 
         if (error instanceof JsonWebTokenError) {
           errorMessage = 'Unauthorized';
-          res.clearCookie('cfAuth');
+          res.clearCookie('cfAuth').status(401);
         } else if (error instanceof TokenExpiredError) {
           errorMessage = 'Token is expired. Try to login again';
-          res.clearCookie('cfAuth');
+          res.clearCookie('cfAuth').status(401);
         } else {
           errorMessage = error.message;
-          status = 500;
         }
 
-        res.status(status);
         throw new Error(errorMessage);
       }
     } else {
