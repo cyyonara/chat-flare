@@ -4,11 +4,11 @@ import http from 'http';
 import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRouter from './routers/authRouter';
-import userRouter from './routers/userRouter';
-import chatRouter from './routers/chatRouter';
-import { dbConnect } from './config/dbConnect';
-import { notFound, errorHandler } from './middlewares/errorHandler';
+import authRouter from './routers/auth.router';
+import userRouter from './routers/user.router';
+import chatRouter from './routers/chat.router';
+import { dbConnect } from './config/db.connect';
+import { notFound, errorHandler } from './middlewares/error.handler';
 
 dotenv.config();
 

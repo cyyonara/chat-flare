@@ -2,7 +2,7 @@ import { IRequest } from '../utils/types';
 import { ITokenPayload } from '../utils/types';
 import { Response, NextFunction } from 'express';
 import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
-import { User } from '../models/userModel';
+import { User } from '../models/user.model';
 import expressAsyncHandler from 'express-async-handler';
 
 export const verify = expressAsyncHandler(

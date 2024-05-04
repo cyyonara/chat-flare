@@ -4,9 +4,10 @@ import { ISignupData } from '../utils/types';
 import { loginSchema, signupSchema } from '../utils/zod-schemas';
 import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
-import { User } from '../models/userModel';
+import { User } from '../models/user.model';
 import bcrypt from 'bcrypt';
 
+// @POST - public - /api/auth/signup
 export const signup = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {
@@ -62,6 +63,7 @@ export const signup = expressAsyncHandler(
   }
 );
 
+// @POST - public - /api/auth/login
 export const login = expressAsyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     try {

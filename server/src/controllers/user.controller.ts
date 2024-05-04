@@ -1,11 +1,12 @@
-import { User } from '../models/userModel';
+import { User } from '../models/user.model';
 import { Response } from 'express';
 import { IRequest } from '../utils/types';
 import { ZodError, z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import expressAsyncHandler from 'express-async-handler';
 import { parsePaginationData } from '../utils/helpers';
+import expressAsyncHandler from 'express-async-handler';
 
+// @PATCH - private - /api/user/profile-picture
 export const updateProfilePicture = expressAsyncHandler(
   async (req: IRequest, res: Response): Promise<void> => {
     try {
@@ -39,6 +40,7 @@ export const updateProfilePicture = expressAsyncHandler(
   }
 );
 
+// @GET - private - /api/user/search?keyword=?&page=?&limit=?
 export const searchUser = expressAsyncHandler(
   async (req: IRequest, res: Response): Promise<void> => {
     const { keyword, page, limit } = req.query;
@@ -47,7 +49,7 @@ export const searchUser = expressAsyncHandler(
       limit as string
     );
     const offset = (parsedPage - 1) * parsedLimit;
-    const results = await User.find({
+    const result = await User.find({
       $and: [
         { _id: { $ne: req.user?._id } },
         {
@@ -59,8 +61,18 @@ export const searchUser = expressAsyncHandler(
       ],
     })
       .limit(parsedLimit)
-      .skip(offset);
+      .skip(offset)
+      .select('username email profilePicture');
 
-    res.status(200).json({ success: true, data: results, message: '' });
+    const userCount = await User.find({ _id: { $ne: req.user?._id } }).countDocuments();
+    const totalPages = Math.ceil(userCount / parsedLimit);
+    const hasNextPage = parsedPage < totalPages;
+    const nextPage = hasNextPage ? parsedPage + 1 : null;
+
+    res.status(200).json({
+      success: true,
+      data: { currentPage: parsedPage, nextPage, users: result, hasNextPage, totalPages },
+      message: 'Success',
+    });
   }
 );

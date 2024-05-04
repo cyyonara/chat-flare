@@ -20,6 +20,7 @@ export const signupSchema = z
   .strict()
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
+    path: ['password', 'confirmPassword'],
   });
 
 export const loginSchema = z
@@ -28,3 +29,32 @@ export const loginSchema = z
     password: z.string(),
   })
   .strict();
+
+export const createChatSchema = z
+  .object({
+    chatName: z.string(),
+    isGroupChat: z.boolean(),
+    people: z.array(z.object({ user: z.string(), isLeaved: z.boolean() })),
+  })
+  .strict()
+  .refine(
+    (data) => {
+      if (data.isGroupChat) {
+        return data.people.length >= 1;
+      }
+      return true;
+    },
+    { message: 'Group chats need atleast 2 or more people', path: ['people'] }
+  )
+  .refine(
+    (data) => {
+      if (!data.isGroupChat) {
+        return data.people.length === 1;
+      }
+      return true;
+    },
+    {
+      message: 'Chats can only have 2 users',
+      path: ['people'],
+    }
+  );
