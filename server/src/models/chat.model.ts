@@ -8,25 +8,25 @@ const chatSchema = new Schema(
     },
     chatCreator: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'User',
       required: true,
     },
     isGroupChat: {
       type: Schema.Types.Boolean,
       required: true,
     },
-    people: {
+    users: {
       type: [
         {
-          user: { type: Schema.Types.ObjectId, ref: 'user', required: true },
-          isLeaved: { type: Schema.Types.Boolean, required: false, default: false },
+          user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+          isLeaved: { type: Schema.Types.Boolean, required: true },
         },
       ],
       required: true,
     },
     lastMessage: {
       type: Schema.Types.ObjectId,
-      ref: 'message',
+      ref: 'Message',
       required: false,
       default: null,
     },
@@ -36,4 +36,18 @@ const chatSchema = new Schema(
 
 interface IChatModel extends InferSchemaType<typeof chatSchema> {}
 
-export const Chat = model<IChatModel>('chat', chatSchema);
+chatSchema.pre('save', function (next) {
+  const usersCopy: { user: string; isLeaved: boolean }[] = [];
+
+  this.users.forEach((user) => {
+    const isUserExist = usersCopy.find((u) => u.user === user._id?.toString());
+
+    if (isUserExist) {
+      throw new Error('Users cannot duplicate');
+    } else {
+      usersCopy.push({ user: user._id!.toString(), isLeaved: false });
+    }
+  });
+});
+
+export const Chat = model<IChatModel>('Chat', chatSchema);

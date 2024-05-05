@@ -34,27 +34,30 @@ export const createChatSchema = z
   .object({
     chatName: z.string(),
     isGroupChat: z.boolean(),
-    people: z.array(z.object({ user: z.string(), isLeaved: z.boolean() })),
+    users: z.array(z.string()),
   })
   .strict()
   .refine(
     (data) => {
       if (data.isGroupChat) {
-        return data.people.length >= 1;
+        return data.users.length >= 1;
       }
       return true;
     },
-    { message: 'Group chats need atleast 2 or more people', path: ['people'] }
+    {
+      message: 'Group chats need atleast 1 or more user at users field',
+      path: ['users'],
+    }
   )
   .refine(
     (data) => {
       if (!data.isGroupChat) {
-        return data.people.length === 1;
+        return data.users.length === 1;
       }
       return true;
     },
     {
       message: 'Chats can only have 2 users',
-      path: ['people'],
+      path: ['users'],
     }
   );

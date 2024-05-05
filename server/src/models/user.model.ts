@@ -6,6 +6,8 @@ const userSchema = new Schema(
     username: {
       type: Schema.Types.String,
       required: true,
+      min: 4,
+      max: 24,
     },
     email: {
       type: Schema.Types.String,
@@ -14,6 +16,8 @@ const userSchema = new Schema(
     password: {
       type: Schema.Types.String,
       required: true,
+      min: 8,
+      max: 24,
     },
     profilePicture: {
       type: Schema.Types.String,
@@ -35,4 +39,4 @@ userSchema.methods.generateToken = function () {
   });
 };
 
-export const User = model<IUserModel>('user', userSchema);
+export const User = model<IUserModel>('User', userSchema);

@@ -4,7 +4,7 @@ const messageSchema = new Schema(
   {
     chatId: {
       type: Schema.Types.ObjectId,
-      ref: 'chat',
+      ref: 'Chat',
       required: true,
     },
     content: {
@@ -27,13 +27,13 @@ const messageSchema = new Schema(
     },
     sender: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'User',
       required: true,
     },
     receivers: {
       type: [
         {
-          user: { type: Schema.Types.ObjectId, ref: 'user', required: true },
+          user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
           isMessageRead: { type: Schema.Types.Boolean, required: false, default: false },
         },
       ],
@@ -45,4 +45,4 @@ const messageSchema = new Schema(
 
 interface IMessageModel extends InferSchemaType<typeof messageSchema> {}
 
-export const Message = model<IMessageModel>('message', messageSchema);
+export const Message = model<IMessageModel>('Message', messageSchema);
