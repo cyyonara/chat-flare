@@ -1,4 +1,4 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
+import { Schema, model, InferSchemaType, Types } from 'mongoose';
 
 const chatSchema = new Schema(
   {
@@ -19,7 +19,7 @@ const chatSchema = new Schema(
       type: [
         {
           user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-          isLeaved: { type: Schema.Types.Boolean, required: true },
+          hasLeft: { type: Schema.Types.Boolean, required: true },
         },
       ],
       required: true,
@@ -37,17 +37,19 @@ const chatSchema = new Schema(
 interface IChatModel extends InferSchemaType<typeof chatSchema> {}
 
 chatSchema.pre('save', function (next) {
-  const usersCopy: { user: string; isLeaved: boolean }[] = [];
+  const usersCopy: { user: Types.ObjectId; hasLeft: boolean }[] = [];
 
   this.users.forEach((user) => {
-    const isUserExist = usersCopy.find((u) => u.user === user._id?.toString());
+    const isUserExist = usersCopy.find((u) => u.user.toString() === user.user.toString());
 
     if (isUserExist) {
       throw new Error('Users cannot duplicate');
     } else {
-      usersCopy.push({ user: user._id!.toString(), isLeaved: false });
+      usersCopy.push(user);
     }
   });
+
+  next();
 });
 
 export const Chat = model<IChatModel>('Chat', chatSchema);
