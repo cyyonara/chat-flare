@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { IRequest } from '../utils/types';
 import { ZodError, z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import { parsePaginationData } from '../utils/helpers';
+import { parsePaginationData, getPaginationResponse } from '../utils/helpers';
 import expressAsyncHandler from 'express-async-handler';
 
 // @PATCH - private - /api/user/profile-picture
@@ -64,14 +64,23 @@ export const searchUser = expressAsyncHandler(
       .skip(offset)
       .select('username email profilePicture');
 
-    const userCount = await User.find({ _id: { $ne: req.user?._id } }).countDocuments();
-    const totalPages = Math.ceil(userCount / parsedLimit);
-    const hasNextPage = parsedPage < totalPages;
-    const nextPage = hasNextPage ? parsedPage + 1 : null;
+    const usersCount = await User.countDocuments({ _id: { $ne: req.user?._id } });
+    const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
+      usersCount,
+      parsedLimit,
+      parsedPage
+    );
 
     res.status(200).json({
       success: true,
-      data: { currentPage: parsedPage, nextPage, users: result, hasNextPage, totalPages },
+      data: {
+        totalPages,
+        totalUsers: usersCount,
+        users: result,
+        currentPage: parsedPage,
+        nextPage,
+        hasNextPage,
+      },
       message: 'Success',
     });
   }

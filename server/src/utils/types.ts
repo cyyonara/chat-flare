@@ -26,3 +26,9 @@ export interface IPaginationData {
   parsedPage: number;
   parsedLimit: number;
 }
+
+export interface IPaginationResponse {
+  totalPages: number;
+  hasNextPage: boolean;
+  nextPage: number | null;
+}

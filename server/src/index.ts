@@ -9,6 +9,7 @@ import userRouter from './routers/user.router';
 import chatRouter from './routers/chat.router';
 import { dbConnect } from './config/db.connect';
 import { notFound, errorHandler } from './middlewares/error.handler';
+import messageRouter from './routers/message.router';
 
 dotenv.config();
 
@@ -21,13 +22,14 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(morgan('dev'));
-app.use(cors({ credentials: true, origin: ['http://localhost:3000'] }));
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/chats', chatRouter);
+app.use('/api/messages', messageRouter);
 
 // error handlers
 app.use(notFound);

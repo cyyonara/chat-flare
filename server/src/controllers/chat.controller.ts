@@ -6,7 +6,8 @@ import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
 import { createChatSchema } from '../utils/zod-schemas';
 import { User } from '../models/user.model';
-import { parsePaginationData } from '../utils/helpers';
+import { Message } from '../models/message.model';
+import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
 
 // @POST - private - /api/chats
 export const createChat = expressAsyncHandler(
@@ -94,5 +95,57 @@ export const getChats = expressAsyncHandler(
       page as string,
       limit as string
     );
+
+    const offset = (parsedPage - 1) * parsedLimit;
+    const chatFilter = {
+      $and: [
+        { users: { $elemMatch: { user: req.user?._id } } },
+        {
+          $or: [
+            { isGroupChat: true },
+            { isGroupChat: false, lastMessage: { $ne: null } },
+          ],
+        },
+      ],
+    };
+
+    const chats = await Chat.find(chatFilter)
+      .sort({ updatedAt: -1 })
+      .limit(parsedLimit)
+      .skip(offset)
+      .populate({
+        path: 'chatCreator users.user',
+        select: '_id username email profilePicture',
+        model: User,
+      })
+      .populate({
+        path: 'lastMessage',
+        model: Message,
+        populate: {
+          path: 'sender receivers.user',
+          select: '_id username email profilePicture',
+          model: User,
+        },
+      });
+
+    const chatsCount = await Chat.countDocuments(chatFilter);
+    const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
+      chatsCount,
+      parsedLimit,
+      parsedPage
+    );
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalPages,
+        totalChats: chatsCount,
+        chats,
+        currentPage: parsedPage,
+        nextPage,
+        hasNextPage,
+      },
+      message: 'Success',
+    });
   }
 );
