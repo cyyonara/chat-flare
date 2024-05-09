@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { IRequest } from '../utils/types';
 import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
-import { createChatSchema } from '../utils/zod-schemas';
+import { createChatSchema } from '../utils/validations';
 import { User } from '../models/user.model';
 import { Message } from '../models/message.model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
@@ -99,7 +99,7 @@ export const getChats = expressAsyncHandler(
     const offset = (parsedPage - 1) * parsedLimit;
     const chatFilter = {
       $and: [
-        { users: { $elemMatch: { user: req.user?._id } } },
+        { users: { $elemMatch: { user: req.user?._id, hasLeft: false } } },
         {
           $or: [
             { isGroupChat: true },

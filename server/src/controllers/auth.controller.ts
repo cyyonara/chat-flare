@@ -1,7 +1,7 @@
 import expressAsyncHandler from 'express-async-handler';
 import { Request, Response } from 'express';
 import { ISignupData } from '../utils/types';
-import { loginSchema, signupSchema } from '../utils/zod-schemas';
+import { loginSchema, signupSchema } from '../utils/validations';
 import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
 import { User } from '../models/user.model';

@@ -61,3 +61,20 @@ export const createChatSchema = z
       path: ['users'],
     }
   );
+
+export const addMessageSchema = z
+  .object({
+    content: z.string().min(1),
+    isImage: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      if (data.isImage) {
+        const { error } = z.string().url().safeParse(data.content);
+        return !error;
+      } else {
+        return true;
+      }
+    },
+    { message: 'Image must have a url content', path: ['content', 'isImage'] }
+  );

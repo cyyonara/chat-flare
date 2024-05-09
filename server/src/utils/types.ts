@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { signupSchema, loginSchema } from '././zod-schemas';
+import { signupSchema, loginSchema } from './validations';
 import { Types, HydratedDocument } from 'mongoose';
 import { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
