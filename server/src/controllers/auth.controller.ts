@@ -42,6 +42,7 @@ export const signup = expressAsyncHandler(
         .json({
           success: true,
           data: {
+            _id: newUser._id,
             username: newUser.username,
             email: newUser.email,
             profilePicture: newUser.profilePicture,
@@ -95,6 +96,7 @@ export const login = expressAsyncHandler(
         .json({
           success: true,
           data: {
+            _id: user._id,
             username: user.username,
             email: user.email,
             profilePicture: user.profilePicture,

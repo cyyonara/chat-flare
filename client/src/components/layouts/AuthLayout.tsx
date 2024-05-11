@@ -6,7 +6,8 @@ interface IProps {}
 const AuthLayout: React.FC<IProps> = () => {
   return (
     <div className="flex h-screen">
-      <div className="flex flex-[1.7] items-center justify-center border-r">
+      <div className="relative isolate hidden flex-[1.7] items-center justify-center overflow-hidden border-r px-9 lg:flex">
+        <div className="absolute -left-[80px] -top-[80px] h-[200px] w-[200px] rounded-full bg-primary shadow-sm shadow-primary"></div>
         <div className="flex max-w-[900px] flex-1 flex-col items-center justify-center gap-y-8">
           <h1 className="font-bold">
             Chat <span className="text-primary">Flare</span>
@@ -276,20 +277,20 @@ const AuthLayout: React.FC<IProps> = () => {
               fill="#ccc"
             />
           </svg>
-          <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt
-            pariatur veritatis omnis debitis quidem distinctio ad vitae nemo,
-            hic sed fuga assumenda, vero dolorum iure dolor rem. Impedit
-            pariatur labore officia quasi, minus ex totam quia perspiciatis
-            magni ipsa molestias quibusdam maxime consequuntur provident. Labore
-            impedit fugiat, cumque molestias nesciunt ullam placeat quam minima
-            repudiandae facilis quae optio voluptatum, aut cum architecto?
-            Incidunt, harum animi! Quis itaque tempore nesciunt perspiciatis
-            praesentium doloribus omnis accusamus quod commodi, dolorem corrupti
-            maiores! Perferendis distinctio eos blanditiis doloribus impedit
-            repudiandae iure nisi consequuntur, culpa modi qui temporibus dolore
-            illum, facilis reiciendis voluptatum neque. Ipsa!
-          </p>
+          <div>
+            <h2 className="mb-2 text-primary">Lorem ipsum dolor sit amet</h2>
+            <p>
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt
+              pariatur veritatis omnis debitis quidem distinctio ad vitae nemo,
+              hic sed fuga assumenda, vero dolorum iure dolor rem. Impedit
+              pariatur labore officia quasi, minus ex totam quia perspiciatis
+              magni ipsa molestias quibusdam maxime consequuntur provident.
+              Labore impedit fugiat, cumque molestias nesciunt ullam placeat
+              quam minima repudiandae facilis quae optio voluptatum, aut cum
+              architecto? Incidunt, harum animi! Quis itaque tempore nesciunt
+              perspiciatis praesentium doloribus omnis accusamus quod commodi,
+            </p>
+          </div>
         </div>
       </div>
       <Outlet />
