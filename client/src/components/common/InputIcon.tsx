@@ -33,7 +33,7 @@ const InputIcon = React.forwardRef<HTMLInputElement, IProps>(
         <input
           type={type}
           className={cn(
-            "peer ml-3 flex-1 py-2 outline-none disabled:cursor-not-allowed disabled:opacity-50",
+            "peer ml-3 flex-1 bg-transparent py-2 outline-none disabled:cursor-not-allowed disabled:opacity-50",
             {
               "ml-0 mr-3": iconPos === "left",
             },

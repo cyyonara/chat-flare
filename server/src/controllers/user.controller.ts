@@ -32,7 +32,7 @@ export const updateProfilePicture = expressAsyncHandler(
         errorMessage = fromZodError(error).toString();
         res.status(400);
       } else {
-        errorMessage = error.message;
+        errorMessage = (error as Error).message;
       }
 
       throw new Error(errorMessage);

@@ -71,7 +71,7 @@ export const addMessage = expressAsyncHandler(
         res.status(400);
         errorMessage = fromZodError(error).toString();
       } else {
-        errorMessage = error.message;
+        errorMessage = (error as Error).message;
       }
 
       throw new Error(errorMessage);

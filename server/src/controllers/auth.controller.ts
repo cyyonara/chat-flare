@@ -56,7 +56,7 @@ export const signup = expressAsyncHandler(
         errorMessage = fromZodError(error).toString();
         res.status(400);
       } else {
-        errorMessage = error.message;
+        errorMessage = (error as Error).message;
       }
 
       throw new Error(errorMessage);
@@ -110,7 +110,44 @@ export const login = expressAsyncHandler(
         errorMessage = fromZodError(error).toString();
         res.status(400);
       } else {
-        errorMessage = error.message;
+        errorMessage = (error as Error).message;
+      }
+
+      throw new Error(errorMessage);
+    }
+  }
+);
+
+// @POST - public - /api/auth/google-login
+export const googleLogin = expressAsyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = loginSchema.pick({ email: true }).parse(req.body);
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        res.status(400);
+        throw new Error("Email isn't connected to an account");
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profilePicture,
+        },
+        message: 'Login success',
+      });
+    } catch (error: any) {
+      let errorMessage: string;
+
+      if (error instanceof ZodError) {
+        errorMessage = fromZodError(error).toString();
+        res.status(400);
+      } else {
+        errorMessage = (error as Error).message;
       }
 
       throw new Error(errorMessage);

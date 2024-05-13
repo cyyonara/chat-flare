@@ -1,9 +1,14 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/custom/useAuth";
 
 interface IProps {}
 
 const AuthLayout: React.FC<IProps> = () => {
+  const user = useAuth((state) => state.user);
+
+  if (user) return <Navigate to="/chats" replace />;
+
   return (
     <div className="flex h-screen">
       <div className="relative isolate hidden flex-[1.7] items-center justify-center overflow-hidden border-r px-9 lg:flex">

@@ -9,13 +9,19 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { ILoginFields } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/schemas";
+import { useLogin } from "@/hooks/api/useLogin";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/custom/useAuth";
 import InputIcon from "@/components/common/InputIcon";
 import GoogleLoginButton from "@/components/login/GoogleLoginButton";
+import { Loader2Icon } from "lucide-react";
 
 interface IProps {}
 
 const Login: React.FC<IProps> = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const { isPending: isLoginLoading, mutate } = useLogin();
+  const setCredentials = useAuth((state) => state.setCredentials);
   const {
     register,
     handleSubmit,
@@ -24,9 +30,18 @@ const Login: React.FC<IProps> = () => {
     mode: "onSubmit",
     resolver: zodResolver(loginSchema),
   });
+  const { toast } = useToast();
 
   const login: SubmitHandler<ILoginFields> = (data): void => {
-    console.log(data);
+    mutate(data, {
+      onSuccess: (response) => setCredentials(response.data),
+      onError: (error) => {
+        toast({
+          title: "Oops!",
+          description: error.response?.data.message,
+        });
+      },
+    });
   };
 
   useEffect(() => {
@@ -53,6 +68,7 @@ const Login: React.FC<IProps> = () => {
                 type="text"
                 id="email"
                 placeholder="e.g user@email.com"
+                disabled={isLoginLoading}
                 {...register("email")}
               />
               {errors.email && (
@@ -65,6 +81,7 @@ const Login: React.FC<IProps> = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Enter your password"
+                disabled={isLoginLoading}
                 icon={
                   showPassword ? (
                     <LiaEye size={18} />
@@ -82,7 +99,12 @@ const Login: React.FC<IProps> = () => {
                 </p>
               )}
             </div>
-            <Button>
+            <Button
+              type="submit"
+              disabled={isLoginLoading}
+              className="flex items-center justify-center gap-x-2"
+            >
+              {isLoginLoading && <Loader2Icon className="animate-spin" />}
               <span>Login</span>
             </Button>
           </form>
@@ -91,7 +113,7 @@ const Login: React.FC<IProps> = () => {
             <p className="text-sm text-gray-500">or</p>
             <Separator className="flex-1" />
           </div>
-          <GoogleLoginButton />
+          <GoogleLoginButton isLoginLoading={isLoginLoading} />
           <p className="text-center text-sm">
             Don't have an account?{" "}
             <Link

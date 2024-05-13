@@ -14,6 +14,7 @@ const login: MutationFunction<IMutationResponse, ILoginFields> = async (
   const response = await axios.post<IMutationResponse>(
     import.meta.env.VITE_API + "auth/login",
     data,
+    { withCredentials: true }
   );
   return response.data;
 };
