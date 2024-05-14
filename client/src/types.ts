@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { loginSchema } from "./lib/schemas";
+import { loginSchema, signupSchema } from "./lib/schemas";
 import { AxiosError } from "axios";
 
 export interface IRequestError extends AxiosError<{ message: string }> {}
@@ -12,11 +12,18 @@ export interface IResponse<T> {
 
 export interface ILoginFields extends z.infer<typeof loginSchema> {}
 
+export interface ISignupFields extends z.infer<typeof signupSchema> {}
+
 export interface IUser {
   _id: string;
   username: string;
   email: string;
   profilePicture: string;
+}
+
+export interface IShowPasswordState {
+  isShowPassword: boolean;
+  isShowConfirmPassword: boolean;
 }
 
 // store types

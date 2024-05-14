@@ -130,16 +130,27 @@ export const googleLogin = expressAsyncHandler(
         throw new Error("Email isn't connected to an account");
       }
 
-      res.status(200).json({
-        success: true,
-        data: {
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          profilePicture: user.profilePicture,
-        },
-        message: 'Login success',
-      });
+      const token: string = user.generateToken();
+
+      res
+        .cookie('cfAuth', token, {
+          path: '/',
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== 'DEV',
+          sameSite: process.env.NODE_ENV === 'DEV' ? 'lax' : 'none',
+          maxAge: 60_000 * 60 * 24 * 60,
+        })
+        .status(200)
+        .json({
+          success: true,
+          data: {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicture,
+          },
+          message: 'Login success',
+        });
     } catch (error: any) {
       let errorMessage: string;
 

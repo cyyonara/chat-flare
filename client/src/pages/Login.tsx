@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,14 +12,15 @@ import { loginSchema } from "@/lib/schemas";
 import { useLogin } from "@/hooks/api/useLogin";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/custom/useAuth";
+import { Loader2Icon } from "lucide-react";
 import InputIcon from "@/components/common/InputIcon";
 import GoogleLoginButton from "@/components/login/GoogleLoginButton";
-import { Loader2Icon } from "lucide-react";
 
 interface IProps {}
 
 const Login: React.FC<IProps> = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [googleLoginLoading, setGoogleLoginLoading] = useState<boolean>(false);
   const { isPending: isLoginLoading, mutate } = useLogin();
   const setCredentials = useAuth((state) => state.setCredentials);
   const {
@@ -32,8 +33,8 @@ const Login: React.FC<IProps> = () => {
   });
   const { toast } = useToast();
 
-  const login: SubmitHandler<ILoginFields> = (data): void => {
-    mutate(data, {
+  const login: SubmitHandler<ILoginFields> = (formData): void => {
+    mutate(formData, {
       onSuccess: (response) => setCredentials(response.data),
       onError: (error) => {
         toast({
@@ -43,6 +44,11 @@ const Login: React.FC<IProps> = () => {
       },
     });
   };
+
+  const setGoogleLoginState = useCallback(
+    (loadingState: boolean): void => setGoogleLoginLoading(loadingState),
+    [],
+  );
 
   useEffect(() => {
     document.title = "Login";
@@ -68,11 +74,11 @@ const Login: React.FC<IProps> = () => {
                 type="text"
                 id="email"
                 placeholder="e.g user@email.com"
-                disabled={isLoginLoading}
+                disabled={isLoginLoading || googleLoginLoading}
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+                <p className="text-xs text-red-500">{errors.email.message}</p>
               )}
             </div>
             <div className="flex flex-col gap-y-2">
@@ -81,12 +87,12 @@ const Login: React.FC<IProps> = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Enter your password"
-                disabled={isLoginLoading}
+                disabled={isLoginLoading || googleLoginLoading}
                 icon={
                   showPassword ? (
-                    <LiaEye size={18} />
+                    <LiaEye size={18} className="text-primary" />
                   ) : (
-                    <LiaEyeSlash size={18} />
+                    <LiaEyeSlash size={18} color="grey" />
                   )
                 }
                 onIconClick={() => setShowPassword(!showPassword)}
@@ -94,14 +100,14 @@ const Login: React.FC<IProps> = () => {
                 {...register("password")}
               />
               {errors.password && (
-                <p className="text-sm text-red-500">
+                <p className="text-xs text-red-500">
                   {errors.password.message}
                 </p>
               )}
             </div>
             <Button
               type="submit"
-              disabled={isLoginLoading}
+              disabled={isLoginLoading || googleLoginLoading}
               className="flex items-center justify-center gap-x-2"
             >
               {isLoginLoading && <Loader2Icon className="animate-spin" />}
@@ -113,7 +119,10 @@ const Login: React.FC<IProps> = () => {
             <p className="text-sm text-gray-500">or</p>
             <Separator className="flex-1" />
           </div>
-          <GoogleLoginButton isLoginLoading={isLoginLoading} />
+          <GoogleLoginButton
+            isLoginLoading={isLoginLoading}
+            setGoogleLoginState={setGoogleLoginState}
+          />
           <p className="text-center text-sm">
             Don't have an account?{" "}
             <Link

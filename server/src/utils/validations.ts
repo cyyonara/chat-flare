@@ -15,7 +15,10 @@ export const signupSchema = z
       .trim()
       .min(8, { message: 'Password must have atleast 8 characters' })
       .max(24, { message: 'You have exceeded the maximum amount for a password' }),
-    confirmPassword: z.string().trim(),
+    confirmPassword: z
+      .string()
+      .trim()
+      .refine((data) => data.length > 1, { message: 'Please confirm your password' }),
   })
   .strict()
   .refine((data) => data.password === data.confirmPassword, {
