@@ -26,6 +26,20 @@ export const signupSchema = z
     path: ['password', 'confirmPassword'],
   });
 
+export const googleSignupSchema = z
+  .object({
+    email: z.string().email({ message: 'Email must be a valid email address' }),
+    username: z
+      .string()
+      .trim()
+      .min(4, { message: 'Username must have atleast 4 characters' })
+      .max(24, {
+        message: 'You have exceeded the maximum amount of characters for a username',
+      }),
+    profilePicture: z.string().url(),
+  })
+  .strict();
+
 export const loginSchema = z
   .object({
     email: z.string().email({ message: 'Email must be a valid email address' }),

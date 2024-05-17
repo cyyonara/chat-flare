@@ -21,6 +21,12 @@ export interface IUser {
   profilePicture: string;
 }
 
+export interface IGoogleCredentials {
+  email: string;
+  username: string;
+  profilePicture: string;
+}
+
 export interface IShowPasswordState {
   isShowPassword: boolean;
   isShowConfirmPassword: boolean;

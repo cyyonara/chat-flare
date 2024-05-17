@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import GoogleLoginButton from "@/components/login/GoogleLoginButton";
 
 interface IProps {}
 
-const Login: React.FC<IProps> = () => {
+export default function Login({}: IProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [googleLoginLoading, setGoogleLoginLoading] = useState<boolean>(false);
   const { isPending: isLoginLoading, mutate } = useLogin();
@@ -32,6 +32,10 @@ const Login: React.FC<IProps> = () => {
     resolver: zodResolver(loginSchema),
   });
   const { toast } = useToast();
+
+  useEffect(() => {
+    document.title = "Login";
+  }, []);
 
   const login: SubmitHandler<ILoginFields> = (formData): void => {
     mutate(formData, {
@@ -49,10 +53,6 @@ const Login: React.FC<IProps> = () => {
     (loadingState: boolean): void => setGoogleLoginLoading(loadingState),
     [],
   );
-
-  useEffect(() => {
-    document.title = "Login";
-  }, []);
 
   return (
     <div className="flex flex-1 items-center justify-center px-5 sm:px-9">
@@ -136,6 +136,4 @@ const Login: React.FC<IProps> = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}

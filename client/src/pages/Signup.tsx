@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import GoogleSignupButton from "@/components/signup/GoogleSignupButton";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,15 +14,18 @@ import { signupSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useSignup } from "@/hooks/api/useSignup";
+import { useToast } from "@/components/ui/use-toast";
 
 interface IProps {}
 
-const Signup: React.FC<IProps> = () => {
+export default function Signup({}: IProps) {
   const { mutate, isPending: isSignupLoading } = useSignup();
   const [passwordsState, setPasswordsState] = useState<IShowPasswordState>({
     isShowPassword: false,
     isShowConfirmPassword: false,
   });
+  const [isGoogleSignupLoading, setIsGoogleSignupLoading] =
+    useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -32,6 +35,16 @@ const Signup: React.FC<IProps> = () => {
     resolver: zodResolver(signupSchema),
   });
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    document.title = "Sign up";
+  }, []);
+
+  const setGoogleSignupState = useCallback(
+    (state: boolean): void => setIsGoogleSignupLoading(state),
+    [],
+  );
 
   const handleSignup: SubmitHandler<ISignupFields> = (formData): void => {
     mutate(formData, {
@@ -41,20 +54,24 @@ const Signup: React.FC<IProps> = () => {
           replace: true,
         });
       },
-      onError: (error): void => {},
+      onError: (error): void => {
+        toast({
+          title: "Oops!",
+          description: error.response?.data.message || "Something went wrong",
+        });
+      },
     });
   };
-
-  useEffect(() => {
-    document.title = "Sign up";
-  }, []);
 
   return (
     <div className="flex flex-1 items-center justify-center px-5 sm:px-9">
       <div className="flex max-w-[400px] flex-1 flex-col gap-y-8">
         <h2 className="text-center font-bold">Create an account</h2>
         <div className="flex flex-col gap-y-4">
-          <GoogleSignupButton />
+          <GoogleSignupButton
+            isSignupLoading={isSignupLoading}
+            setGoogleSignupState={setGoogleSignupState}
+          />
           <div className="flex items-center justify-center gap-x-3">
             <Separator className="flex-1" />
             <p className="text-sm text-gray-500">or</p>
@@ -75,7 +92,7 @@ const Signup: React.FC<IProps> = () => {
                 id="username"
                 type="text"
                 placeholder="example@email.com"
-                disabled={isSignupLoading}
+                disabled={isSignupLoading || isGoogleSignupLoading}
                 {...register("email")}
               />
               {errors.email && (
@@ -93,7 +110,7 @@ const Signup: React.FC<IProps> = () => {
                 id="username"
                 type="text"
                 placeholder="Enter your username"
-                disabled={isSignupLoading}
+                disabled={isSignupLoading || isGoogleSignupLoading}
                 {...register("username")}
               />
               {errors.username && (
@@ -127,7 +144,7 @@ const Signup: React.FC<IProps> = () => {
                     isShowPassword: !prev.isShowPassword,
                   }));
                 }}
-                disabled={isSignupLoading}
+                disabled={isSignupLoading || isGoogleSignupLoading}
                 {...register("password")}
               />
               {errors.password && (
@@ -163,7 +180,7 @@ const Signup: React.FC<IProps> = () => {
                     isShowConfirmPassword: !prev.isShowConfirmPassword,
                   }));
                 }}
-                disabled={isSignupLoading}
+                disabled={isSignupLoading || isGoogleSignupLoading}
                 {...register("confirmPassword")}
               />
               {errors.confirmPassword && (
@@ -175,7 +192,7 @@ const Signup: React.FC<IProps> = () => {
             <Button
               type="submit"
               className="flex items-center justify-center gap-x-2"
-              disabled={isSignupLoading}
+              disabled={isSignupLoading || isGoogleSignupLoading}
             >
               {isSignupLoading && <Loader2 className="animate-spin" />}
               <span>Sign up</span>
@@ -191,6 +208,4 @@ const Signup: React.FC<IProps> = () => {
       </div>
     </div>
   );
-};
-
-export default Signup;
+}

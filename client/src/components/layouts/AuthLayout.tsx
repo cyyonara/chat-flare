@@ -1,10 +1,9 @@
-import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/custom/useAuth";
 
 interface IProps {}
 
-const AuthLayout: React.FC<IProps> = () => {
+export default function AuthLayoutReact({}: IProps) {
   const user = useAuth((state) => state.user);
 
   if (user) return <Navigate to="/chats" replace />;
@@ -301,6 +300,4 @@ const AuthLayout: React.FC<IProps> = () => {
       <Outlet />
     </div>
   );
-};
-
-export default AuthLayout;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import { memo } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { useGoogleLogin } from "@/hooks/api/useGoogleLogin";
@@ -10,10 +10,10 @@ interface IProps {
   setGoogleLoginState: (loginState: boolean) => void;
 }
 
-const GoogleLoginButton: React.FC<IProps> = ({
+export default memo(function GoogleLoginButton({
   isLoginLoading,
   setGoogleLoginState,
-}) => {
+}: IProps) {
   const { mutate, isPending: isGoogleLoginLoading } = useGoogleLogin();
   const setCredentials = useAuth((state) => state.setCredentials);
   const { toast } = useToast();
@@ -43,6 +43,4 @@ const GoogleLoginButton: React.FC<IProps> = ({
       <span>Continue with Google</span>
     </Button>
   );
-};
-
-export default React.memo(GoogleLoginButton);
+});

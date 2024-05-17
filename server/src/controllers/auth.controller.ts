@@ -1,11 +1,20 @@
 import expressAsyncHandler from 'express-async-handler';
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import { ISignupData } from '../utils/types';
-import { loginSchema, signupSchema } from '../utils/validations';
+import { googleSignupSchema, loginSchema, signupSchema } from '../utils/validations';
 import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
 import { User } from '../models/user.model';
+import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcrypt';
+
+const cookieOptions: CookieOptions = {
+  path: '/',
+  httpOnly: true,
+  secure: process.env.NODE_ENV !== 'DEV',
+  sameSite: process.env.NODE_ENV === 'DEV' ? 'lax' : 'none',
+  maxAge: 60_000 * 60 * 24 * 60,
+};
 
 // @POST - public - /api/auth/signup
 export const signup = expressAsyncHandler(
@@ -31,13 +40,7 @@ export const signup = expressAsyncHandler(
       const token: string = newUser.generateToken();
 
       res
-        .cookie('cfAuth', token, {
-          path: '/',
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== 'DEV',
-          sameSite: process.env.NODE_ENV === 'DEV' ? 'lax' : 'none',
-          maxAge: 60_000 * 60 * 24 * 60,
-        })
+        .cookie('cfAuth', token, cookieOptions)
         .status(201)
         .json({
           success: true,
@@ -85,13 +88,7 @@ export const login = expressAsyncHandler(
 
       const token: string = user.generateToken();
       res
-        .cookie('cfAuth', token, {
-          path: '/',
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== 'DEV',
-          sameSite: process.env.NODE_ENV === 'DEV' ? 'lax' : 'none',
-          maxAge: 60_000 * 60 * 24 * 60,
-        })
+        .cookie('cfAuth', token, cookieOptions)
         .status(200)
         .json({
           success: true,
@@ -133,13 +130,7 @@ export const googleLogin = expressAsyncHandler(
       const token: string = user.generateToken();
 
       res
-        .cookie('cfAuth', token, {
-          path: '/',
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== 'DEV',
-          sameSite: process.env.NODE_ENV === 'DEV' ? 'lax' : 'none',
-          maxAge: 60_000 * 60 * 24 * 60,
-        })
+        .cookie('cfAuth', token, cookieOptions)
         .status(200)
         .json({
           success: true,
@@ -150,6 +141,50 @@ export const googleLogin = expressAsyncHandler(
             profilePicture: user.profilePicture,
           },
           message: 'Login success',
+        });
+    } catch (error: any) {
+      let errorMessage: string;
+
+      if (error instanceof ZodError) {
+        errorMessage = fromZodError(error).toString();
+        res.status(400);
+      } else {
+        errorMessage = (error as Error).message;
+      }
+
+      throw new Error(errorMessage);
+    }
+  }
+);
+
+// @POST - public - /api/auth/google-signup
+export const googleSignup = expressAsyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, ...rest } = googleSignupSchema.parse(req.body);
+      const user = await User.findOne({ email });
+
+      if (user) {
+        res.status(400);
+        throw new Error('This email is already connected to an account');
+      }
+
+      const hashedPassword = await bcrypt.hash(uuid(), 10);
+      const newUser = await User.create({ email, password: hashedPassword, ...rest });
+      const token: string = newUser.generateToken();
+
+      res
+        .cookie('cfAuth', token, cookieOptions)
+        .status(201)
+        .json({
+          success: true,
+          data: {
+            _id: newUser._id,
+            username: newUser.username,
+            email: newUser.email,
+            profilePicture: newUser.profilePicture,
+          },
+          message: 'Sign up successful',
         });
     } catch (error: any) {
       let errorMessage: string;
