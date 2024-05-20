@@ -1,12 +1,13 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/custom/useAuth";
+import { AnimatePresence } from "framer-motion";
 
 interface IProps {}
 
 export default function AuthLayoutReact({}: IProps) {
   const user = useAuth((state) => state.user);
 
-  if (user) return <Navigate to="/chats" replace />;
+  if (user) return <Navigate to="/chats" state={null} replace />;
 
   return (
     <div className="flex h-screen">
@@ -297,7 +298,9 @@ export default function AuthLayoutReact({}: IProps) {
           </div>
         </div>
       </div>
-      <Outlet />
+      <AnimatePresence>
+        <Outlet />
+      </AnimatePresence>
     </div>
   );
 }

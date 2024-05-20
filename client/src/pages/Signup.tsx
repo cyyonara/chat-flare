@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useSignup } from "@/hooks/api/useSignup";
 import { useToast } from "@/components/ui/use-toast";
+import { motion } from "framer-motion";
 
 interface IProps {}
 
@@ -64,7 +65,14 @@ export default function Signup({}: IProps) {
   };
 
   return (
-    <div className="flex flex-1 items-center justify-center px-5 sm:px-9">
+    <motion.div
+      key="signup"
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -100, opacity: 0 }}
+      transition={{ duration: 0.6 }}
+      className="flex flex-1 items-center justify-center px-5 sm:px-9"
+    >
       <div className="flex max-w-[400px] flex-1 flex-col gap-y-8">
         <h2 className="text-center font-bold">Create an account</h2>
         <div className="flex flex-col gap-y-4">
@@ -206,6 +214,6 @@ export default function Signup({}: IProps) {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

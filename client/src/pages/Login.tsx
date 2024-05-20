@@ -13,6 +13,7 @@ import { useLogin } from "@/hooks/api/useLogin";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/custom/useAuth";
 import { Loader2Icon } from "lucide-react";
+import { motion } from "framer-motion";
 import InputIcon from "@/components/common/InputIcon";
 import GoogleLoginButton from "@/components/login/GoogleLoginButton";
 
@@ -55,7 +56,14 @@ export default function Login({}: IProps) {
   );
 
   return (
-    <div className="flex flex-1 items-center justify-center px-5 sm:px-9">
+    <motion.div
+      key="login"
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -100, opacity: 0 }}
+      transition={{ duration: 0.6 }}
+      className="flex flex-1 items-center justify-center px-5 sm:px-9"
+    >
       <div className="flex max-w-[400px] flex-1 flex-col items-center gap-y-8">
         <h2 className=" text-center font-bold">
           Login with Chat{" "}
@@ -134,6 +142,6 @@ export default function Login({}: IProps) {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

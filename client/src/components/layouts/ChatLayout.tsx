@@ -1,5 +1,11 @@
+import Sidebar from "@/components/chats/Sidebar";
+
 interface IProps {}
 
 export default function ChatLayout({}: IProps) {
-  return <div></div>;
+  return (
+    <div className="flex">
+      <Sidebar />
+    </div>
+  );
 }
