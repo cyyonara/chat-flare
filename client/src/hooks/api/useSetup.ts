@@ -9,9 +9,10 @@ import axios from "axios";
 
 interface IMutationResponse extends IResponse<{ newProfilePicture: string }> {}
 
-const setupAccount: MutationFunction<IMutationResponse, File> = async (
-  imageFile: File,
-) => {
+const setupAccount: MutationFunction<
+  { newProfilePicture: string },
+  File
+> = async (imageFile: File) => {
   const imageURL = await uploadImage(imageFile);
   const response = await axios.patch<IMutationResponse>(
     import.meta.env.VITE_API + "user/profile-picture",
@@ -20,15 +21,15 @@ const setupAccount: MutationFunction<IMutationResponse, File> = async (
     },
     { withCredentials: true },
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const useSetup = (): UseMutationResult<
-  IMutationResponse,
+  { newProfilePicture: string },
   IRequestError,
   File
 > => {
-  return useMutation<IMutationResponse, IRequestError, File>({
+  return useMutation<{ newProfilePicture: string }, IRequestError, File>({
     mutationKey: ["set up"],
     mutationFn: setupAccount,
   });

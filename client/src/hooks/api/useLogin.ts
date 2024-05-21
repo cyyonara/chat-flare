@@ -8,23 +8,21 @@ import axios from "axios";
 
 interface IMutationResponse extends IResponse<IUser> {}
 
-const login: MutationFunction<IMutationResponse, ILoginFields> = async (
-  data,
-) => {
+const login: MutationFunction<IUser, ILoginFields> = async (data) => {
   const response = await axios.post<IMutationResponse>(
     import.meta.env.VITE_API + "auth/login",
     data,
-    { withCredentials: true }
+    { withCredentials: true },
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const useLogin = (): UseMutationResult<
-  IMutationResponse,
+  IUser,
   IRequestError,
   ILoginFields
 > => {
-  return useMutation({
+  return useMutation<IUser, IRequestError, ILoginFields>({
     mutationKey: ["login"],
     mutationFn: login,
   });

@@ -47,10 +47,10 @@ const AccountSetup: React.FC<IProps> = () => {
   const setupAccount = (): void => {
     if (imageFile) {
       mutate(imageFile, {
-        onSuccess: (response) => {
+        onSuccess: (data) => {
           setCredentials({
             ...userCredentials,
-            profilePicture: response.data.newProfilePicture,
+            profilePicture: data.newProfilePicture,
           });
           toast({
             title: "Sign up success",

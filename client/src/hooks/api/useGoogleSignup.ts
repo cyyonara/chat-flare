@@ -9,22 +9,22 @@ import axios from "axios";
 
 interface IMutationResponse extends IResponse<IUser> {}
 
-const googleSignup: MutationFunction<IMutationResponse, null> = async () => {
+const googleSignup: MutationFunction<IUser, null> = async () => {
   const googleCredentials = await getGoogleCredentials();
   const response = await axios.post<IMutationResponse>(
     import.meta.env.VITE_API + "auth/google-signup",
     googleCredentials,
     { withCredentials: true },
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const useGoogleSignup = (): UseMutationResult<
-  IMutationResponse,
+  IUser,
   IRequestError,
   null
 > => {
-  return useMutation<IMutationResponse, IRequestError, null>({
+  return useMutation<IUser, IRequestError, null>({
     mutationKey: ["google-signup"],
     mutationFn: googleSignup,
   });

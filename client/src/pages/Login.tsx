@@ -40,7 +40,7 @@ export default function Login({}: IProps) {
 
   const login: SubmitHandler<ILoginFields> = (formData): void => {
     mutate(formData, {
-      onSuccess: (response) => setCredentials(response.data),
+      onSuccess: (data) => setCredentials(data),
       onError: (error) => {
         toast({
           title: "Oops!",

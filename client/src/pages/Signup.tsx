@@ -49,9 +49,9 @@ export default function Signup({}: IProps) {
 
   const handleSignup: SubmitHandler<ISignupFields> = (formData): void => {
     mutate(formData, {
-      onSuccess: (response): void => {
+      onSuccess: (data): void => {
         navigate("/account/set-up", {
-          state: response.data,
+          state: data,
           replace: true,
         });
       },

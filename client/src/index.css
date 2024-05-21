@@ -64,3 +64,18 @@
     @apply text-3xl;
   }
 }
+
+@layer components {
+  .custom-scroll::-webkit-scrollbar {
+    width: 4px;
+    padding: 1px;
+  }
+
+  .custom-scroll::-webkit-scrollbar-track {
+    @apply rounded-full bg-accent;
+  }
+
+  .custom-scroll::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-primary;
+  }
+}
