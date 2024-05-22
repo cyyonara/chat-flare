@@ -22,7 +22,7 @@ export const useLogin = (): UseMutationResult<
   IRequestError,
   ILoginFields
 > => {
-  return useMutation<IUser, IRequestError, ILoginFields>({
+  return useMutation({
     mutationKey: ["login"],
     mutationFn: login,
   });

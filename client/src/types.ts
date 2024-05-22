@@ -21,8 +21,15 @@ export interface IUser {
   profilePicture: string;
 }
 
-// message types
+export interface IPaginatedUsers {
+  totalPages: number;
+  users: IUser[];
+  currentPage: number;
+  nextPage: number | null;
+  hasNextPage: boolean;
+}
 
+// message types
 interface IReceiver {
   user: IUser;
   isMessageRead: boolean;
@@ -51,11 +58,12 @@ interface IChatUser {
 
 export interface IChat {
   _id: string;
+  chatPhoto: string;
   chatName: string;
   chatCreator: IUser;
   isGroupChat: boolean;
   users: IChatUser[];
-  lastMessage: IMessage;
+  lastMessage: IMessage | null;
   createdAt: string;
   updatedAt: string;
 }

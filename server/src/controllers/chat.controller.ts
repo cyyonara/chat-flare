@@ -15,6 +15,7 @@ export const createChat = expressAsyncHandler(
     try {
       const { chatName, users, isGroupChat } = createChatSchema.parse(req.body);
       const chat = new Chat({
+        chatPhoto: req.user?.profilePicture,
         chatName,
         chatCreator: req.user?._id,
         isGroupChat,

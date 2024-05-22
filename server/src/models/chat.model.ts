@@ -2,6 +2,10 @@ import { Schema, model, InferSchemaType, Types } from 'mongoose';
 
 const chatSchema = new Schema(
   {
+    chatPhoto: {
+      type: Schema.Types.String,
+      required: true,
+    },
     chatName: {
       type: Schema.Types.String,
       required: true,

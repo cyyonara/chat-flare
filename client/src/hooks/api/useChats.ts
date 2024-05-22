@@ -1,31 +1,32 @@
 import {
-  useInfiniteQuery,
+  InfiniteData,
   UseInfiniteQueryResult,
+  useInfiniteQuery,
+  QueryFunction,
 } from "@tanstack/react-query";
-import { IResponse, IRequestError, IPaginatedChats } from "@/types";
+import { IResponse, IPaginatedChats, IRequestError } from "@/types";
 import axios from "axios";
 
 interface IQueryResponse extends IResponse<IPaginatedChats> {}
 
-const getChats = async ({
-  pageParam = 1,
-}: {
-  pageParam: number;
-}): Promise<IPaginatedChats> => {
+const getChats: QueryFunction<IPaginatedChats, [string], number> = async ({
+  pageParam,
+}) => {
   const response = await axios.get<IQueryResponse>(
-    import.meta.env + `chats?page=${pageParam}&limit=10`,
+    import.meta.env.VITE_API + `chats?page=${pageParam}&limit=10`,
     { withCredentials: true },
   );
   return response.data.data;
 };
 
 export const useChats = (): UseInfiniteQueryResult<
-  IPaginatedChats,
+  InfiniteData<IPaginatedChats>,
   IRequestError
 > => {
   return useInfiniteQuery({
     queryKey: ["chats"],
-    queryFn: ({ pageParam }) => getChats({ pageParam }),
+    queryFn: getChats,
     getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 1,
   });
 };

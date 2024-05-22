@@ -29,7 +29,7 @@ export const useSetup = (): UseMutationResult<
   IRequestError,
   File
 > => {
-  return useMutation<{ newProfilePicture: string }, IRequestError, File>({
+  return useMutation({
     mutationKey: ["set up"],
     mutationFn: setupAccount,
   });

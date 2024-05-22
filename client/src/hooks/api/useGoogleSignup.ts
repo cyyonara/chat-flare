@@ -24,7 +24,7 @@ export const useGoogleSignup = (): UseMutationResult<
   IRequestError,
   null
 > => {
-  return useMutation<IUser, IRequestError, null>({
+  return useMutation({
     mutationKey: ["google-signup"],
     mutationFn: googleSignup,
   });

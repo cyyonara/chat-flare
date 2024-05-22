@@ -2,7 +2,6 @@ import {
   useMutation,
   MutationFunction,
   UseMutationResult,
-  useInfiniteQuery,
 } from "@tanstack/react-query";
 import { ISignupFields, IRequestError, IResponse, IUser } from "@/types";
 import axios from "axios";
@@ -22,7 +21,7 @@ export const useSignup = (): UseMutationResult<
   IRequestError,
   ISignupFields
 > => {
-  return useMutation<IUser, IRequestError, ISignupFields>({
+  return useMutation({
     mutationKey: ["signup"],
     mutationFn: signup,
   });
