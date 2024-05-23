@@ -36,7 +36,7 @@ interface IReceiver {
   _id: string;
 }
 
-interface IMessage {
+export interface IMessage {
   _id: string;
   chatId: string;
   content: string;

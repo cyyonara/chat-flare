@@ -5,10 +5,15 @@ import Signup from "@/pages/Signup";
 import ChatLayout from "@/components/layouts/ChatLayout";
 import AuthProvider from "@/components/providers/AuthProvider";
 import AccountSetup from "@/pages/AccountSetup";
+import { useEffect } from "react";
 
 interface IProps {}
 
 export default function App({}: IProps) {
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
+
   return (
     <Routes>
       <Route element={<AuthLayout />}>

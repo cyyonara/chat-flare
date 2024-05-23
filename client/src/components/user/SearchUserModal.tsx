@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Search, CircleX } from "lucide-react";
+import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/custom/useDebounce";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
 import { useInView } from "react-intersection-observer";
 import InputIcon from "@/components/common/InputIcon";
@@ -74,36 +74,39 @@ export default function SearchUserModal({ closeModal }: IProps) {
                 ref={searchInputRef}
               />
               <div className="custom-scroll flex max-h-[300px] flex-col gap-y-2 overflow-y-auto p-2">
-                {isError && <UserSearchError retry={() => refetch()} />}
-                {isSuccess &&
-                  (!data.pages[0].users.length ? (
-                    <p className="text-center">No users found</p>
-                  ) : (
-                    data.pages.map((page) =>
-                      page.users.map((user) => (
-                        <UserResult
-                          key={user._id}
-                          _id={user._id}
-                          username={user.username}
-                          email={user.email}
-                          profilePicture={user.profilePicture}
-                        />
-                      )),
-                    )
-                  ))}
                 {isLoading && <UserResultSkeleton count={1} />}
                 {isFetching && <UserResultSkeleton count={1} />}
-                {isSuccess && <div ref={ref}></div>}
+                {isError && <UserSearchError retry={() => refetch()} />}
+                {isSuccess && (
+                  <React.Fragment>
+                    {!data.pages[0].users.length ? (
+                      <p className="text-center">No users found</p>
+                    ) : (
+                      data.pages.map((page) =>
+                        page.users.map((user) => (
+                          <UserResult
+                            key={user._id}
+                            _id={user._id}
+                            username={user.username}
+                            email={user.email}
+                            profilePicture={user.profilePicture}
+                          />
+                        )),
+                      )
+                    )}
+                    <div ref={ref}></div>
+                  </React.Fragment>
+                )}
               </div>
             </div>
           </CardContent>
           <CardFooter>
             <Button
-              className="ml-auto flex items-center gap-x-2"
+              variant="secondary"
+              className="ml-auto"
               onClick={closeModal}
             >
-              <CircleX size={20} />
-              <span>Close</span>
+              Close
             </Button>
           </CardFooter>
         </Card>

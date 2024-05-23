@@ -1,22 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/custom/useAuth";
-import { Search, Settings } from "lucide-react";
+import { Search, Settings, Plus } from "lucide-react";
 import {
   Tooltip,
   TooltipProvider,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SidebarContent from "@/components/chats/SidebarContent";
 import SearchUserModal from "@/components/user/SearchUserModal";
+import CreateGroupModal from "./CreateGroupModal";
 
 interface IProps {}
 
 export default function Sidebar({}: IProps) {
   const user = useAuth((state) => state.user);
   const [showSearchUserModal, setShowSearchUserModal] =
+    useState<boolean>(false);
+  const [showCreateGroupModal, setShowCreateGroupModal] =
     useState<boolean>(false);
 
   return (
@@ -26,7 +30,7 @@ export default function Sidebar({}: IProps) {
           <SearchUserModal closeModal={() => setShowSearchUserModal(false)} />
         )}
       </AnimatePresence>
-      <div className="flex h-screen w-[350px] flex-col border-r">
+      <div className="relative flex h-screen w-[350px] flex-col border-r">
         <div className="flex items-center gap-x-3 border-b p-5">
           <Avatar>
             <AvatarImage src={user?.profilePicture} />
@@ -67,7 +71,27 @@ export default function Sidebar({}: IProps) {
           </div>
         </div>
         <SidebarContent />
+        <div className="absolute bottom-6 right-6">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="h-[50px] w-[50px] rounded-full p-3"
+                  onClick={() => setShowCreateGroupModal(true)}
+                >
+                  <Plus size={20} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Create Group</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
+      <AnimatePresence>
+        {showCreateGroupModal && (
+          <CreateGroupModal closeModal={() => setShowCreateGroupModal(false)} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

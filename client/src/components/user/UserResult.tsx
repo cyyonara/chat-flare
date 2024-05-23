@@ -26,8 +26,8 @@ export default function UserResult({
         </AvatarFallback>
       </Avatar>
       <div className="flex flex-1 flex-col">
-        <p className="font-semibold">{username}</p>
-        <span className="text-xs">{email}</span>
+        <p className="line-clamp-1 font-semibold">{username}</p>
+        <span className="line-clamp-1 text-xs">{email}</span>
       </div>
       <TooltipProvider>
         <Tooltip>
