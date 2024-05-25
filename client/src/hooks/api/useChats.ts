@@ -13,7 +13,7 @@ const getChats: QueryFunction<IPaginatedChats, [string], number> = async ({
   pageParam,
 }) => {
   const response = await axios.get<IQueryResponse>(
-    import.meta.env.VITE_API + `chats?page=${pageParam}&limit=10`,
+    import.meta.env.VITE_API + `/api/chats?page=${pageParam}&limit=10`,
     { withCredentials: true },
   );
   return response.data.data;

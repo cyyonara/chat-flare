@@ -12,7 +12,7 @@ interface IMutationResponse extends IResponse<IUser> {}
 const googleLogin: MutationFunction<IUser, null> = async () => {
   const { email } = await getGoogleCredentials();
   const response = await axios.post<IMutationResponse>(
-    import.meta.env.VITE_API + "auth/google-login",
+    import.meta.env.VITE_API + "/api/auth/google-login",
     { email },
     { withCredentials: true },
   );

@@ -21,7 +21,7 @@ export default memo(function GoogleLoginButton({
   const handleGoogleLogin = (): void => {
     setGoogleLoginState(true);
     mutate(null, {
-      onSuccess: (response) => setCredentials(response.data),
+      onSuccess: (data) => setCredentials(data),
       onError: (error) => {
         toast({
           title: "Oops!",

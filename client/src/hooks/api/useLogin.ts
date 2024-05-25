@@ -10,7 +10,7 @@ interface IMutationResponse extends IResponse<IUser> {}
 
 const login: MutationFunction<IUser, ILoginFields> = async (data) => {
   const response = await axios.post<IMutationResponse>(
-    import.meta.env.VITE_API + "auth/login",
+    import.meta.env.VITE_API + "/api/auth/login",
     data,
     { withCredentials: true },
   );

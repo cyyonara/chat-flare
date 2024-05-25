@@ -68,6 +68,12 @@ export interface IChat {
   updatedAt: string;
 }
 
+export interface INewChat {
+  chatName: string;
+  isGroupChat: boolean;
+  users: IUser[];
+}
+
 export interface IPaginatedChats {
   totalPages: number;
   totalChats: number;

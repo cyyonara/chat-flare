@@ -21,10 +21,10 @@ export default memo(function GoogleSignupButton({
   const handleGoogleSignup = (): void => {
     setGoogleSignupState(true);
     mutate(null, {
-      onSuccess: (response): void => {
+      onSuccess: (data): void => {
         navigate("/account/set-up", {
           replace: true,
-          state: response.data,
+          state: data,
         });
       },
       onError: (error) => {

@@ -15,6 +15,8 @@ import { Search } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "@/hooks/custom/useDebounce";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
+import { useCreateChat } from "@/hooks/api/useCreateChat";
+import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import Overlay from "@/components/common/Overlay";
 import InputIcon from "@/components/common/InputIcon";
@@ -31,6 +33,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [groupName, setGroupName] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
+  const { mutate, isPending: isCreateChatLoading } = useCreateChat();
   const debounceValue = useDebounce(searchKeyword);
   const {
     data,
@@ -42,6 +45,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
     refetch,
   } = useSearchUsers(debounceValue);
   const { ref, inView } = useInView();
+  const { toast } = useToast();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSelectedUsers = useCallback(
@@ -54,6 +58,17 @@ export default function CreateGroupModal({ closeModal }: IProps) {
     },
     [],
   );
+
+  const handleCreateChat = (): void => {
+    if (groupName !== "" && selectedUsers.length) {
+      mutate(
+        { chatName: groupName, isGroupChat: true, users: selectedUsers },
+        {
+          onError: (err) => console.log(err.response?.data.message),
+        },
+      );
+    }
+  };
 
   useEffect(() => {
     if (inView) {
@@ -111,6 +126,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                     email={user.email}
                     profilePicture={user.profilePicture}
                     handleSelectedUsers={handleSelectedUsers}
+                    isCreateChatLoading={isCreateChatLoading}
                   />
                 ))}
               </div>
@@ -133,6 +149,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                             profilePicture={user.profilePicture}
                             selectedUsers={selectedUsers}
                             handleSelectedUsers={handleSelectedUsers}
+                            isCreateChatLoading={isCreateChatLoading}
                           />
                         )),
                       )
@@ -147,7 +164,14 @@ export default function CreateGroupModal({ closeModal }: IProps) {
             <Button variant="secondary" onClick={closeModal}>
               Cancel
             </Button>
-            <Button disabled={groupName === "" || selectedUsers.length < 1}>
+            <Button
+              onClick={handleCreateChat}
+              disabled={
+                groupName === "" ||
+                selectedUsers.length < 1 ||
+                isCreateChatLoading
+              }
+            >
               Create
             </Button>
           </CardFooter>

@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 
 interface IProps extends IUser {
   handleSelectedUsers: (checked: boolean, user: IUser) => void;
+  isCreateChatLoading: boolean;
 }
 
 export default memo(function SelectedUser({
@@ -13,11 +14,13 @@ export default memo(function SelectedUser({
   email,
   profilePicture,
   handleSelectedUsers,
+  isCreateChatLoading,
 }: IProps) {
   return (
     <div className="relative">
       <button
-        className="absolute -right-[1px] -top-[2px] z-[20] rounded-full bg-secondary p-[3px] hover:bg-secondary/80"
+        className="disabled:text- absolute -right-[1px] -top-[2px] z-[20] rounded-full bg-secondary p-[3px] hover:bg-secondary/80 disabled:cursor-not-allowed disabled:bg-foreground disabled:text-black"
+        disabled={isCreateChatLoading}
         onClick={() =>
           handleSelectedUsers(false, { _id, username, email, profilePicture })
         }

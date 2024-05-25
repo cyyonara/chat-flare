@@ -14,23 +14,23 @@ const getUsers: QueryFunction<
   [string, string],
   number
 > = async ({ queryKey, pageParam }) => {
-  const searchKeyword = queryKey[1];
+  const keyword = queryKey[1];
   const response = await axios.get<IQueryResponse>(
     import.meta.env.VITE_API +
-      `user/search?keyword=${searchKeyword}&page=${pageParam}&limit=5`,
+      `/api/user/search?keyword=${keyword}&page=${pageParam}&limit=5`,
     { withCredentials: true },
   );
   return response.data.data;
 };
 
 export const useSearchUsers = (
-  searchKeyword: string,
+  keyword: string,
 ): UseInfiniteQueryResult<InfiniteData<IPaginatedUsers>, IRequestError> => {
   return useInfiniteQuery({
-    queryKey: ["search-users", searchKeyword],
+    queryKey: ["search-users", keyword],
     queryFn: getUsers,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
-    enabled: searchKeyword ? true : false,
+    enabled: keyword ? true : false,
   });
 };

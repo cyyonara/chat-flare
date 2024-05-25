@@ -6,6 +6,7 @@ import { memo } from "react";
 interface IProps extends IUser {
   selectedUsers: IUser[];
   handleSelectedUsers: (checked: boolean, user: IUser) => void;
+  isCreateChatLoading: boolean;
 }
 
 export default memo(function AddUserResult({
@@ -15,6 +16,7 @@ export default memo(function AddUserResult({
   profilePicture,
   selectedUsers,
   handleSelectedUsers,
+  isCreateChatLoading,
 }: IProps) {
   const isInList = (): boolean => {
     const userExist = selectedUsers.find((user) => user._id === _id);
@@ -34,6 +36,7 @@ export default memo(function AddUserResult({
         <span className="line-clamp-1 text-xs">{email}</span>
       </div>
       <Checkbox
+        disabled={isCreateChatLoading}
         checked={isInList()}
         onCheckedChange={(checked) =>
           handleSelectedUsers(checked as boolean, {

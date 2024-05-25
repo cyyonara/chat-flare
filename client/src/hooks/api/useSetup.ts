@@ -15,7 +15,7 @@ const setupAccount: MutationFunction<
 > = async (imageFile: File) => {
   const imageURL = await uploadImage(imageFile);
   const response = await axios.patch<IMutationResponse>(
-    import.meta.env.VITE_API + "user/profile-picture",
+    import.meta.env.VITE_API + "/api/user/profile-picture",
     {
       profilePicture: imageURL,
     },

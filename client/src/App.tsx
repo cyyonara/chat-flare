@@ -22,7 +22,9 @@ export default function App({}: IProps) {
         <Route path="/account/set-up" element={<AccountSetup />} />
       </Route>
       <Route element={<AuthProvider />}>
-        <Route path="/chats/*" element={<ChatLayout />}></Route>
+        <Route path="/chats/*" element={<ChatLayout />}>
+          <Route index element={<h1>empty chats</h1>} />
+        </Route>
       </Route>
     </Routes>
   );
