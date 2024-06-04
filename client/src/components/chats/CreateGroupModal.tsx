@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { IUser } from "@/types";
+import { IPaginatedChats, IUser } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -17,6 +17,8 @@ import { useDebounce } from "@/hooks/custom/useDebounce";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
 import { useCreateChat } from "@/hooks/api/useCreateChat";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import Overlay from "@/components/common/Overlay";
 import InputIcon from "@/components/common/InputIcon";
@@ -46,6 +48,8 @@ export default function CreateGroupModal({ closeModal }: IProps) {
   } = useSearchUsers(debounceValue);
   const { ref, inView } = useInView();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSelectedUsers = useCallback(
@@ -59,12 +63,44 @@ export default function CreateGroupModal({ closeModal }: IProps) {
     [],
   );
 
-  const handleCreateChat = (): void => {
-    if (groupName !== "" && selectedUsers.length) {
+  const handleCreateGroupChat = (): void => {
+    if (groupName && selectedUsers.length) {
       mutate(
         { chatName: groupName, isGroupChat: true, users: selectedUsers },
         {
-          onError: (err) => console.log(err.response?.data.message),
+          onSuccess: (data) => {
+            toast({
+              title: "Success!",
+              description: `Group "${data.chatName} successfully created."`,
+            });
+            queryClient.setQueryData(
+              ["chats"],
+              (
+                queryData: InfiniteData<IPaginatedChats>,
+              ): InfiniteData<IPaginatedChats> => ({
+                ...queryData,
+                pages: queryData.pages.map((page, i) => {
+                  if (!i) {
+                    return {
+                      ...page,
+                      chats: [data, ...page.chats],
+                    };
+                  } else {
+                    return page;
+                  }
+                }),
+              }),
+            );
+            queryClient.invalidateQueries({ queryKey: ["chats"], exact: true });
+            closeModal();
+            navigate(`/chats/${data._id}`);
+          },
+          onError: (err) => {
+            toast({
+              title: "Oops!",
+              description: err.response?.data.message || "Something went wrong",
+            });
+          },
         },
       );
     }
@@ -165,7 +201,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
               Cancel
             </Button>
             <Button
-              onClick={handleCreateChat}
+              onClick={handleCreateGroupChat}
               disabled={
                 groupName === "" ||
                 selectedUsers.length < 1 ||

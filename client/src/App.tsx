@@ -5,6 +5,7 @@ import Signup from "@/pages/Signup";
 import ChatLayout from "@/components/layouts/ChatLayout";
 import AuthProvider from "@/components/providers/AuthProvider";
 import AccountSetup from "@/pages/AccountSetup";
+import Conversation from "@/pages/Conversation";
 import { useEffect } from "react";
 
 interface IProps {}
@@ -24,6 +25,7 @@ export default function App({}: IProps) {
       <Route element={<AuthProvider />}>
         <Route path="/chats/*" element={<ChatLayout />}>
           <Route index element={<h1>empty chats</h1>} />
+          <Route path=":chatId" element={<Conversation />} />
         </Route>
       </Route>
     </Routes>

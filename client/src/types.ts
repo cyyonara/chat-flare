@@ -50,7 +50,7 @@ export interface IMessage {
 }
 
 // chat types
-interface IChatUser {
+export interface IChatUser {
   user: IUser;
   hasLeft: boolean;
   _id: string;

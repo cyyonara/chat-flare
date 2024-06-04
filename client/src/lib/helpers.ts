@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/custom/useAuth";
-import { IUser, IMessage } from "@/types";
+import { IUser, IMessage, IChatUser } from "@/types";
 
 export const checkImage = (file: File) => {
   const allowedFileExt: string[] = ["jpeg", "jpg", "png", "webp"];
@@ -21,12 +21,17 @@ export const getLastMessageInfo = (lastMessage: IMessage): string => {
   let messageInfo: string;
 
   if (lastMessage.isImage) {
-    messageInfo = "sent a photo";
+    messageInfo = " sent a photo";
   } else if (lastMessage.isLeaveMessage) {
-    messageInfo = "leave the group";
+    messageInfo = " leave the group";
   } else {
-    messageInfo = "sent a message";
+    messageInfo = `: ${lastMessage.content}`;
   }
 
-  return `${getUserInfo(lastMessage.sender)} ${messageInfo}`;
+  return `${getUserInfo(lastMessage.sender) + messageInfo}`;
+};
+
+export const getChatMateInfo = (chatUser: IChatUser[]): IChatUser => {
+  const currentUserId = useAuth().user!._id;
+  return chatUser.find((user) => user._id !== currentUserId) as IChatUser;
 };
