@@ -7,14 +7,14 @@ import { IResponse, IRequestError } from "@/types";
 import { uploadImage } from "@/services/firebase";
 import axios from "axios";
 
-interface IMutationResponse extends IResponse<{ newProfilePicture: string }> {}
+type TMutationResponse = IResponse<{ newProfilePicture: string }>;
 
 const setupAccount: MutationFunction<
   { newProfilePicture: string },
   File
 > = async (imageFile: File) => {
   const imageURL = await uploadImage(imageFile);
-  const response = await axios.patch<IMutationResponse>(
+  const response = await axios.patch<TMutationResponse>(
     import.meta.env.VITE_API + "/api/user/profile-picture",
     {
       profilePicture: imageURL,

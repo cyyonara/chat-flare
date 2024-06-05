@@ -7,12 +7,12 @@ import {
 import { IResponse, IPaginatedChats, IRequestError } from "@/types";
 import axios from "axios";
 
-interface IQueryResponse extends IResponse<IPaginatedChats> {}
+type TQueryResponse = IResponse<IPaginatedChats>;
 
 const getChats: QueryFunction<IPaginatedChats, [string], number> = async ({
   pageParam,
 }) => {
-  const response = await axios.get<IQueryResponse>(
+  const response = await axios.get<TQueryResponse>(
     import.meta.env.VITE_API + `/api/chats?page=${pageParam}&limit=10`,
     { withCredentials: true },
   );

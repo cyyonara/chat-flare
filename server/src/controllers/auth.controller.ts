@@ -17,186 +17,178 @@ const cookieOptions: CookieOptions = {
 };
 
 // @POST - public - /api/auth/signup
-export const signup = expressAsyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email, username, password }: ISignupData = signupSchema.parse(req.body);
-      const isEmailExist = await User.exists({ email });
+export const signup = expressAsyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email, username, password }: ISignupData = signupSchema.parse(req.body);
+    const isEmailExist = await User.exists({ email });
 
-      if (isEmailExist) {
-        res.status(400);
-        throw new Error('Email address already exists');
-      }
-
-      const isUsernameExist = await User.exists({ username });
-
-      if (isUsernameExist) {
-        res.status(400);
-        throw new Error('Username already exists');
-      }
-
-      const hashedPassword: string = await bcrypt.hash(password, 10);
-      const newUser = await User.create({ username, email, password: hashedPassword });
-      const token: string = newUser.generateToken();
-
-      res
-        .cookie('cfAuth', token, cookieOptions)
-        .status(201)
-        .json({
-          success: true,
-          data: {
-            _id: newUser._id,
-            username: newUser.username,
-            email: newUser.email,
-            profilePicture: newUser.profilePicture,
-          },
-          message: 'Sign up successful',
-        });
-    } catch (error: any) {
-      let errorMessage: string;
-
-      if (error instanceof ZodError) {
-        errorMessage = fromZodError(error).toString();
-        res.status(400);
-      } else {
-        errorMessage = (error as Error).message;
-      }
-
-      throw new Error(errorMessage);
+    if (isEmailExist) {
+      res.status(400);
+      throw new Error('Email address already exists');
     }
+
+    const isUsernameExist = await User.exists({ username });
+
+    if (isUsernameExist) {
+      res.status(400);
+      throw new Error('Username already exists');
+    }
+
+    const hashedPassword: string = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ username, email, password: hashedPassword });
+    const token: string = newUser.generateToken();
+
+    res
+      .cookie('cfAuth', token, cookieOptions)
+      .status(201)
+      .json({
+        success: true,
+        data: {
+          _id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+          profilePicture: newUser.profilePicture,
+        },
+        message: 'Sign up successful',
+      });
+  } catch (error: any) {
+    let errorMessage: string;
+
+    if (error instanceof ZodError) {
+      errorMessage = fromZodError(error).toString();
+      res.status(400);
+    } else {
+      errorMessage = (error as Error).message;
+    }
+
+    throw new Error(errorMessage);
   }
-);
+});
 
 // @POST - public - /api/auth/login
-export const login = expressAsyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email, password } = loginSchema.parse(req.body);
-      const user = await User.findOne({ email });
+export const login = expressAsyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email, password } = loginSchema.parse(req.body);
+    const user = await User.findOne({ email });
 
-      if (!user) {
-        res.status(401);
-        throw new Error('Invalid email or password');
-      }
-
-      const isPasswordsMatch = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordsMatch) {
-        res.status(401);
-        throw new Error('Invalid email or password');
-      }
-
-      const token: string = user.generateToken();
-      res
-        .cookie('cfAuth', token, cookieOptions)
-        .status(200)
-        .json({
-          success: true,
-          data: {
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicture,
-          },
-          message: 'Login successful',
-        });
-    } catch (error: any) {
-      let errorMessage: string;
-
-      if (error instanceof ZodError) {
-        errorMessage = fromZodError(error).toString();
-        res.status(400);
-      } else {
-        errorMessage = (error as Error).message;
-      }
-
-      throw new Error(errorMessage);
+    if (!user) {
+      res.status(401);
+      throw new Error('Invalid email or password');
     }
+
+    const isPasswordsMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordsMatch) {
+      res.status(401);
+      throw new Error('Invalid email or password');
+    }
+
+    const token: string = user.generateToken();
+    res
+      .cookie('cfAuth', token, cookieOptions)
+      .status(200)
+      .json({
+        success: true,
+        data: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profilePicture,
+        },
+        message: 'Login successful',
+      });
+  } catch (error: any) {
+    let errorMessage: string;
+
+    if (error instanceof ZodError) {
+      errorMessage = fromZodError(error).toString();
+      res.status(400);
+    } else {
+      errorMessage = (error as Error).message;
+    }
+
+    throw new Error(errorMessage);
   }
-);
+});
 
 // @POST - public - /api/auth/google-login
-export const googleLogin = expressAsyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email } = loginSchema.pick({ email: true }).parse(req.body);
-      const user = await User.findOne({ email });
+export const googleLogin = expressAsyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email } = loginSchema.pick({ email: true }).parse(req.body);
+    const user = await User.findOne({ email });
 
-      if (!user) {
-        res.status(400);
-        throw new Error("Email isn't connected to an account");
-      }
-
-      const token: string = user.generateToken();
-
-      res
-        .cookie('cfAuth', token, cookieOptions)
-        .status(200)
-        .json({
-          success: true,
-          data: {
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicture,
-          },
-          message: 'Login success',
-        });
-    } catch (error: any) {
-      let errorMessage: string;
-
-      if (error instanceof ZodError) {
-        errorMessage = fromZodError(error).toString();
-        res.status(400);
-      } else {
-        errorMessage = (error as Error).message;
-      }
-
-      throw new Error(errorMessage);
+    if (!user) {
+      res.status(400);
+      throw new Error("Email isn't connected to an account");
     }
+
+    const token: string = user.generateToken();
+
+    res
+      .cookie('cfAuth', token, cookieOptions)
+      .status(200)
+      .json({
+        success: true,
+        data: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profilePicture,
+        },
+        message: 'Login success',
+      });
+  } catch (error: any) {
+    let errorMessage: string;
+
+    if (error instanceof ZodError) {
+      errorMessage = fromZodError(error).toString();
+      res.status(400);
+    } else {
+      errorMessage = (error as Error).message;
+    }
+
+    throw new Error(errorMessage);
   }
-);
+});
 
 // @POST - public - /api/auth/google-signup
-export const googleSignup = expressAsyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email, ...rest } = googleSignupSchema.parse(req.body);
-      const user = await User.findOne({ email });
+export const googleSignup = expressAsyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email, ...rest } = googleSignupSchema.parse(req.body);
+    const user = await User.findOne({ email });
 
-      if (user) {
-        res.status(400);
-        throw new Error('This email is already connected to an account');
-      }
-
-      const hashedPassword = await bcrypt.hash(uuid(), 10);
-      const newUser = await User.create({ email, password: hashedPassword, ...rest });
-      const token: string = newUser.generateToken();
-
-      res
-        .cookie('cfAuth', token, cookieOptions)
-        .status(201)
-        .json({
-          success: true,
-          data: {
-            _id: newUser._id,
-            username: newUser.username,
-            email: newUser.email,
-            profilePicture: newUser.profilePicture,
-          },
-          message: 'Sign up successful',
-        });
-    } catch (error: any) {
-      let errorMessage: string;
-
-      if (error instanceof ZodError) {
-        errorMessage = fromZodError(error).toString();
-        res.status(400);
-      } else {
-        errorMessage = (error as Error).message;
-      }
-
-      throw new Error(errorMessage);
+    if (user) {
+      res.status(400);
+      throw new Error('This email is already connected to an account');
     }
+
+    const hashedPassword = await bcrypt.hash(uuid(), 10);
+    const newUser = await User.create({ email, password: hashedPassword, ...rest });
+    const token: string = newUser.generateToken();
+
+    res
+      .cookie('cfAuth', token, cookieOptions)
+      .status(201)
+      .json({
+        success: true,
+        data: {
+          _id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+          profilePicture: newUser.profilePicture,
+        },
+        message: 'Sign up successful',
+      });
+  } catch (error: any) {
+    let errorMessage: string;
+
+    if (error instanceof ZodError) {
+      errorMessage = fromZodError(error).toString();
+      res.status(400);
+    } else {
+      errorMessage = (error as Error).message;
+    }
+
+    throw new Error(errorMessage);
   }
-);
+});

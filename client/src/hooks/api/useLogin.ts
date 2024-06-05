@@ -6,10 +6,10 @@ import {
 import { ILoginFields, IRequestError, IResponse, IUser } from "@/types";
 import axios from "axios";
 
-interface IMutationResponse extends IResponse<IUser> {}
+type TMutationResponse = IResponse<IUser>;
 
 const login: MutationFunction<IUser, ILoginFields> = async (data) => {
-  const response = await axios.post<IMutationResponse>(
+  const response = await axios.post<TMutationResponse>(
     import.meta.env.VITE_API + "/api/auth/login",
     data,
     { withCredentials: true },

@@ -7,12 +7,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { AnimatePresence } from "framer-motion";
 import SidebarContent from "@/components/chats/SidebarContent";
 import SearchUserModal from "@/components/user/SearchUserModal";
-import CreateGroupModal from "./CreateGroupModal";
+import CreateGroupModal from "@/components/chats/CreateGroupModal";
 
 interface IProps {}
 

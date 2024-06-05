@@ -9,6 +9,7 @@ import userRouter from './routers/user.router';
 import chatRouter from './routers/chat.router';
 import { dbConnect } from './config/db.connect';
 import { notFound, errorHandler } from './middlewares/error.handler';
+import { Server } from 'socket.io';
 import messageRouter from './routers/message.router';
 
 dotenv.config();
@@ -20,6 +21,13 @@ const port = process.env.PORT || 4001;
 
 const app = express();
 const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    credentials: true,
+    allowedHeaders: '*',
+  },
+});
 
 app.use(morgan('dev'));
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
@@ -37,4 +45,11 @@ app.use(errorHandler);
 
 server.listen(port, () => {
   console.log(`server is running at port ${port}`);
+});
+
+io.on('connection', (socket) => {
+  socket.on('new-groupChat', (newGroupChat) => {
+    console.log(newGroupChat);
+    socket.broadcast.emit('new-groupChat', newGroupChat);
+  });
 });

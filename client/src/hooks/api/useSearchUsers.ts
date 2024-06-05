@@ -7,7 +7,7 @@ import {
 import { IPaginatedUsers, IResponse, IRequestError } from "@/types";
 import axios from "axios";
 
-interface IQueryResponse extends IResponse<IPaginatedUsers> {}
+type TQueryResponse = IResponse<IPaginatedUsers>;
 
 const getUsers: QueryFunction<
   IPaginatedUsers,
@@ -15,7 +15,7 @@ const getUsers: QueryFunction<
   number
 > = async ({ queryKey, pageParam }) => {
   const keyword = queryKey[1];
-  const response = await axios.get<IQueryResponse>(
+  const response = await axios.get<TQueryResponse>(
     import.meta.env.VITE_API +
       `/api/user/search?keyword=${keyword}&page=${pageParam}&limit=5`,
     { withCredentials: true },

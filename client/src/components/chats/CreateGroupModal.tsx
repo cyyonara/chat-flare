@@ -20,6 +20,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { socket } from "@/components/providers/SocketProvider";
 import Overlay from "@/components/common/Overlay";
 import InputIcon from "@/components/common/InputIcon";
 import UserResultSkeleton from "@/components/skeletons/UserResultSkeleton";
@@ -71,7 +72,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
           onSuccess: (data) => {
             toast({
               title: "Success!",
-              description: `Group "${data.chatName} successfully created."`,
+              description: `Group "${data.chatName}" successfully created.`,
             });
             queryClient.setQueryData(
               ["chats"],
@@ -94,6 +95,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
             queryClient.invalidateQueries({ queryKey: ["chats"], exact: true });
             closeModal();
             navigate(`/chats/${data._id}`);
+            socket.emit("new-groupChat", data);
           },
           onError: (err) => {
             toast({
