@@ -7,7 +7,7 @@ export const checkImage = (file: File) => {
   const actualFileExt = fileExt[fileExt.length - 1];
 
   const isFileAllowed = allowedFileExt.find(
-    (f) => f === actualFileExt.toLowerCase(),
+    (fileExt) => fileExt === actualFileExt.toLowerCase(),
   );
   return isFileAllowed ? true : false;
 };
@@ -33,5 +33,5 @@ export const getLastMessageInfo = (lastMessage: IMessage): string => {
 
 export const getChatMateInfo = (chatUser: IChatUser[]): IChatUser => {
   const currentUserId = useAuth().user!._id;
-  return chatUser.find((user) => user._id !== currentUserId) as IChatUser;
+  return chatUser?.find((user) => user._id !== currentUserId) as IChatUser;
 };

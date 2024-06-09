@@ -25,7 +25,6 @@ export const useGoogleLogin = (): UseMutationResult<
   null
 > => {
   return useMutation({
-    mutationKey: ["google-login"],
     mutationFn: googleLogin,
   });
 };

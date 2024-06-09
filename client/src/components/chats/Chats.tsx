@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import GroupChat from "@/components/chats/GroupChat";
 import Chat from "@/components/chats/Chat";
 import ChatsSkeleton from "@/components/skeletons/ChatsSkeleton";
@@ -34,7 +34,7 @@ export default function Chats({}: IProps) {
         </div>
       )}
       {isSuccess && (
-        <React.Fragment>
+        <>
           {data.pages.map((page) =>
             page.chats.map((chat) =>
               chat.isGroupChat ? (
@@ -45,7 +45,7 @@ export default function Chats({}: IProps) {
             ),
           )}
           <div ref={ref}></div>
-        </React.Fragment>
+        </>
       )}
       {isLoading && <ChatsSkeleton count={2} />}
       {isFetching && <ChatsSkeleton count={2} />}

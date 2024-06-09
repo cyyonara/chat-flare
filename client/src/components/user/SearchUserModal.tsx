@@ -59,7 +59,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Search a User</CardTitle>
+            <CardTitle>Search a user</CardTitle>
             <CardDescription>Start talking with your friends</CardDescription>
           </CardHeader>
           <CardContent>

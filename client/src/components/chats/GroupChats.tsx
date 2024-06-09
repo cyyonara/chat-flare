@@ -4,7 +4,6 @@ import { useInView } from "react-intersection-observer";
 import UserSearchError from "@/components/error/UserSearchError";
 import ChatsSkeleton from "@/components/skeletons/ChatsSkeleton";
 import GroupChat from "@/components/chats/GroupChat";
-import React from "react";
 
 interface IProps {}
 
@@ -34,14 +33,14 @@ export default function GroupChats({}: IProps) {
         </div>
       )}
       {isSuccess && (
-        <React.Fragment>
+        <>
           {data.pages.map((page) =>
             page.chats
               .filter((chat) => chat.isGroupChat)
               .map((chat) => <GroupChat key={chat._id} {...chat} />),
           )}
           <div ref={ref}></div>
-        </React.Fragment>
+        </>
       )}
       {isLoading && <ChatsSkeleton count={2} />}
       {isFetching && <ChatsSkeleton count={2} />}

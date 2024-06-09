@@ -35,7 +35,7 @@ const AccountSetup: React.FC<IProps> = () => {
       if (!checkImage(imageFile)) {
         toast({
           title: "Invalid File",
-          description: 'Only file of type "image" are allowed',
+          description: 'Only file of type "image" are allowed.',
         });
       } else {
         setImageFile(imageFile);

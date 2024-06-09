@@ -22,7 +22,6 @@ export const useSignup = (): UseMutationResult<
   ISignupFields
 > => {
   return useMutation({
-    mutationKey: ["signup"],
     mutationFn: signup,
   });
 };

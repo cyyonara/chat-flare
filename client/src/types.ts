@@ -49,6 +49,42 @@ export interface IMessage {
   updatedAt: string;
 }
 
+export interface INewMessage {
+  chatId: string;
+  content: string | File;
+  isImage: boolean;
+}
+
+export interface IFetchedMessage extends IMessage {
+  isSending: boolean;
+  statusId: string;
+}
+
+export interface IPaginatedMessages {
+  chatId: string;
+  totalPages: number;
+  totalMessages: number;
+  messages: IMessage[];
+  currentPage: number;
+  nextPage: number | null;
+  hasNextPage: boolean;
+}
+
+export interface IPaginatedFetchedMessages {
+  chatId: string;
+  totalPages: number;
+  totalMessages: number;
+  currentPage: number;
+  nextPage: number | null;
+  hasNextPage: boolean;
+  messages: IFetchedMessage[];
+}
+
+export interface ISelectedImage {
+  imageId: string;
+  imageFile: File;
+}
+
 // chat types
 export interface IChatUser {
   user: IUser;

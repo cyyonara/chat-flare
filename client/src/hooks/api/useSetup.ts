@@ -30,7 +30,6 @@ export const useSetup = (): UseMutationResult<
   File
 > => {
   return useMutation({
-    mutationKey: ["set up"],
     mutationFn: setupAccount,
   });
 };

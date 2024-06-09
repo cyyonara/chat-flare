@@ -48,6 +48,8 @@ export default function SocketProvider({}: IProps) {
         queryClient.invalidateQueries({ queryKey: ["chats"], exact: true });
       }
     });
+
+    socket.on("new-message", (updatedChat: IChat) => {});
   }, []);
 
   return <>{<Outlet />}</>;

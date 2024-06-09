@@ -108,7 +108,7 @@ export const getChatMessages = expressAsyncHandler(
         model: User,
       });
 
-    const messagesCount = await Message.countDocuments();
+    const messagesCount = await Message.countDocuments({ chatId });
     const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
       messagesCount,
       parsedLimit,

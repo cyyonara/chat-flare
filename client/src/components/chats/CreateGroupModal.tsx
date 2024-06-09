@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -125,9 +125,10 @@ export default function CreateGroupModal({ closeModal }: IProps) {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Create Group</CardTitle>
+            <CardTitle>Create a Group</CardTitle>
             <CardDescription>
-              Start talking with multiple friends at the same time
+              Set up a new group chat to connect with your friends, family, or
+              colleagues.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -173,7 +174,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                 {isFetching && <UserResultSkeleton count={1} />}
                 {isError && <UserSearchError retry={() => refetch()} />}
                 {isSuccess && (
-                  <React.Fragment>
+                  <>
                     {!data.pages[0].users.length ? (
                       <p className="text-center">No users found</p>
                     ) : (
@@ -193,7 +194,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                       )
                     )}
                     <div ref={ref}></div>
-                  </React.Fragment>
+                  </>
                 )}
               </div>
             </div>

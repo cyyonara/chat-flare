@@ -23,7 +23,6 @@ export const useLogin = (): UseMutationResult<
   ILoginFields
 > => {
   return useMutation({
-    mutationKey: ["login"],
     mutationFn: login,
   });
 };

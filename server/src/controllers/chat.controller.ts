@@ -8,7 +8,6 @@ import { createChatSchema } from '../utils/validations';
 import { User } from '../models/user.model';
 import { Message } from '../models/message.model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
-import { Types } from 'mongoose';
 
 // @POST - private - /api/chats
 export const createChat = expressAsyncHandler(async (req: IRequest, res: Response) => {

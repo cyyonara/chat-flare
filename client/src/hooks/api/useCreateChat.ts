@@ -26,7 +26,6 @@ export const useCreateChat = (): UseMutationResult<
   INewChat
 > => {
   return useMutation({
-    mutationKey: ["add-chat"],
     mutationFn: createChat,
   });
 };

@@ -49,7 +49,6 @@ server.listen(port, () => {
 
 io.on('connection', (socket) => {
   socket.on('new-groupChat', (newGroupChat) => {
-    console.log(newGroupChat);
     socket.broadcast.emit('new-groupChat', newGroupChat);
   });
 });
