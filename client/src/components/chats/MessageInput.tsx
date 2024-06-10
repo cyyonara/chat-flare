@@ -20,6 +20,7 @@ import { useQueryClient, InfiniteData } from "@tanstack/react-query";
 import { IPaginatedFetchedMessages } from "@/types";
 import SelectedImage from "@/components/chats/SelectedImage";
 import { useAuth } from "@/hooks/custom/useAuth";
+import { socket } from "@/components/providers/SocketProvider";
 
 interface IProps {
   isSuccess: boolean;
@@ -60,14 +61,14 @@ export default function MessageInput({ isSuccess }: IProps) {
   const handleSendMessage = (e: FormEvent): void => {
     e.preventDefault();
     if (message) {
+      const statusId = uuid();
+      const _id = uuid();
+
       queryClient.setQueryData(
         ["messages", chatId],
         (
           queryData: InfiniteData<IPaginatedFetchedMessages>,
         ): InfiniteData<IPaginatedFetchedMessages> => {
-          const statusId = uuid();
-          const _id = uuid();
-
           return {
             ...queryData,
             pages: queryData.pages.map((page, i) => {
@@ -103,10 +104,31 @@ export default function MessageInput({ isSuccess }: IProps) {
         { chatId: chatId as string, content: message, isImage: false },
         {
           onSuccess: (data) => {
+            queryClient.setQueryData(
+              ["messages", data._id],
+              (
+                queryData: InfiniteData<IPaginatedFetchedMessages>,
+              ): InfiniteData<IPaginatedFetchedMessages> => ({
+                ...queryData,
+                pages: queryData.pages.map((page) => ({
+                  ...page,
+                  messages: page.messages.map((message) => {
+                    if (message.statusId === statusId) {
+                      return { ...message, isSending: false };
+                    } else {
+                      return message;
+                    }
+                  }),
+                })),
+              }),
+            );
+
             queryClient.invalidateQueries({
-              queryKey: ["messages", chatId],
+              queryKey: ["messages", data._id],
               exact: true,
             });
+
+            socket.emit("new-message", data);
           },
         },
       );
@@ -115,6 +137,46 @@ export default function MessageInput({ isSuccess }: IProps) {
 
     if (selectedImages.length) {
       selectedImages.forEach((selectedImage) => {
+        queryClient.setQueryData(
+          ["messages", chatId],
+          (
+            queryData: InfiniteData<IPaginatedFetchedMessages>,
+          ): InfiniteData<IPaginatedFetchedMessages> => {
+            const statusId = uuid();
+            const _id = uuid();
+
+            return {
+              ...queryData,
+              pages: queryData.pages.map((page, i) => {
+                if (!i) {
+                  return {
+                    ...page,
+                    messages: [
+                      {
+                        _id,
+                        chatId: chatId as string,
+                        content: URL.createObjectURL(selectedImage.imageFile),
+                        isImage: true,
+                        isLeaveMessage: false,
+                        isNewMemberMessage: false,
+                        sender: currentUser as IUser,
+                        receivers: [],
+                        createdAt: new Date().toString(),
+                        updatedAt: new Date().toString(),
+                        statusId,
+                        isSending: true,
+                      },
+                      ...page.messages,
+                    ],
+                  };
+                } else {
+                  return page;
+                }
+              }),
+            };
+          },
+        );
+
         mutate(
           {
             chatId: chatId as string,
@@ -122,6 +184,13 @@ export default function MessageInput({ isSuccess }: IProps) {
             isImage: true,
           },
           {
+            onSuccess: (data) => {
+              queryClient.invalidateQueries({
+                queryKey: ["messages", data._id],
+                exact: true,
+              });
+              socket.emit("new-message", data);
+            },
             onError: (error) => console.log(error.response?.data.message),
           },
         );
@@ -135,6 +204,7 @@ export default function MessageInput({ isSuccess }: IProps) {
       setShowEmojiPicker(false);
     };
     document.documentElement.addEventListener("click", handleDocumentClick);
+
     return () => {
       document.documentElement.removeEventListener(
         "click",
@@ -169,7 +239,8 @@ export default function MessageInput({ isSuccess }: IProps) {
           <Tooltip>
             <TooltipTrigger
               type="button"
-              disabled={!isSuccess}
+              className="disabled:cursor-not-allowed"
+              disabled={!isSuccess || !!selectedImages.length}
               onClick={() => imageInputRef.current?.click()}
             >
               <CiImageOn size={20} />

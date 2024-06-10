@@ -27,7 +27,7 @@ export default function MessagesContainer({ isFetchingChatSuccess }: IProps) {
           {data.pages.map((page, pageIndex) =>
             page.messages.map((message, messageIndex) => (
               <Message
-                key={message._id}
+                key={message.statusId}
                 {...message}
                 pageIndex={pageIndex}
                 messageIndex={messageIndex}

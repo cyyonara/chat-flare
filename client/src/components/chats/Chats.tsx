@@ -27,7 +27,7 @@ export default function Chats({}: IProps) {
   }, [inView]);
 
   return (
-    <div className="max-h custom-scroll max-h-[calc(100vh-169px)] flex-1 overflow-y-auto">
+    <div className="max-h custom-scroll max-h-[calc(100vh-169px)] flex-1 overflow-y-auto overflow-x-hidden">
       {isError && (
         <div className="pt-8">
           <UserSearchError retry={refetch} />

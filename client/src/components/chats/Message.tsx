@@ -18,13 +18,13 @@ interface IProps extends IFetchedMessage {
 }
 
 export default function Message({
+  statusId,
   content,
   isImage,
   isLeaveMessage,
   isNewMemberMessage,
   isSending,
   sender,
-  receivers,
   messageIndex,
   pageIndex,
   pages,

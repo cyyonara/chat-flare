@@ -51,4 +51,8 @@ io.on('connection', (socket) => {
   socket.on('new-groupChat', (newGroupChat) => {
     socket.broadcast.emit('new-groupChat', newGroupChat);
   });
+
+  socket.on('new-message', (updatedChat) => {
+    socket.broadcast.emit('new-message', updatedChat);
+  });
 });

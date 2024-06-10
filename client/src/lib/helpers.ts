@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/custom/useAuth";
-import { IUser, IMessage, IChatUser } from "@/types";
+import { IUser, IMessage, IChatUser, IChat } from "@/types";
 
 export const checkImage = (file: File) => {
   const allowedFileExt: string[] = ["jpeg", "jpg", "png", "webp"];
@@ -34,4 +34,10 @@ export const getLastMessageInfo = (lastMessage: IMessage): string => {
 export const getChatMateInfo = (chatUser: IChatUser[]): IChatUser => {
   const currentUserId = useAuth().user!._id;
   return chatUser?.find((user) => user._id !== currentUserId) as IChatUser;
+};
+
+export const isInChat = (chat: IChat, currentUserId: string): boolean => {
+  return !!chat.users.find(
+    (userObj) => userObj.user._id === currentUserId && !userObj.hasLeft,
+  );
 };
