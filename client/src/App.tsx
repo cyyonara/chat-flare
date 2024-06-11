@@ -12,25 +12,25 @@ import { useEffect } from "react";
 interface IProps {}
 
 export default function App({}: IProps) {
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-  }, []);
+   useEffect(() => {
+      document.documentElement.classList.add("dark");
+   }, []);
 
-  return (
-    <Routes>
-      <Route element={<AuthLayout />}>
-        <Route index element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/account/set-up" element={<AccountSetup />} />
-      </Route>
-      <Route element={<AuthProvider />}>
-        <Route element={<SocketProvider />}>
-          <Route path="/chats/*" element={<ChatLayout />}>
-            <Route index element={<h1>empty chats</h1>} />
-            <Route path=":chatId" element={<Conversation />} />
-          </Route>
-        </Route>
-      </Route>
-    </Routes>
-  );
+   return (
+      <Routes>
+         <Route element={<AuthLayout />}>
+            <Route index element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/account/set-up" element={<AccountSetup />} />
+         </Route>
+         <Route element={<AuthProvider />}>
+            <Route element={<SocketProvider />}>
+               <Route path="/chats/*" element={<ChatLayout />}>
+                  <Route index element={<h1>empty chats</h1>} />
+                  <Route path=":chatId" element={<Conversation />} />
+               </Route>
+            </Route>
+         </Route>
+      </Routes>
+   );
 }

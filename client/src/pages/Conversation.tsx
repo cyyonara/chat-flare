@@ -7,23 +7,23 @@ import { useParams } from "react-router-dom";
 interface IProps {}
 
 export default function Conversation({}: IProps) {
-  const { chatId } = useParams();
-  const { data, isLoading, isSuccess } = useChat(chatId as string);
+   const { chatId } = useParams();
+   const { data, isLoading, isSuccess } = useChat(chatId as string);
 
-  return (
-    <div className="flex flex-1">
-      <div className="flex flex-1 flex-col">
-        <ConversationHeader
-          chat={data}
-          isLoading={isLoading}
-          isSuccess={isSuccess}
-        />
-        <main className="flex flex-1 flex-col overflow-y-auto">
-          <MessagesContainer isFetchingChatSuccess={isSuccess} />
-          <MessageInput isSuccess={isSuccess} />
-        </main>
+   return (
+      <div className="flex flex-1">
+         <div className="flex flex-1 flex-col">
+            <ConversationHeader
+               chat={data}
+               isLoading={isLoading}
+               isSuccess={isSuccess}
+            />
+            <main className="flex flex-1 flex-col overflow-y-auto">
+               <MessagesContainer isFetchingChatSuccess={isSuccess} />
+               <MessageInput isSuccess={isSuccess} />
+            </main>
+         </div>
+         <div className="w-[350px] border-l"></div>
       </div>
-      <div className="w-[350px] border-l"></div>
-    </div>
-  );
+   );
 }

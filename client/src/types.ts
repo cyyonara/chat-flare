@@ -5,9 +5,9 @@ import { AxiosError } from "axios";
 export interface IRequestError extends AxiosError<{ message: string }> {}
 
 export interface IResponse<T> {
-  success: boolean;
-  data: T;
-  message: null;
+   success: boolean;
+   data: T;
+   message: null;
 }
 
 export interface ILoginFields extends z.infer<typeof loginSchema> {}
@@ -15,124 +15,124 @@ export interface ILoginFields extends z.infer<typeof loginSchema> {}
 export interface ISignupFields extends z.infer<typeof signupSchema> {}
 
 export interface IUser {
-  _id: string;
-  username: string;
-  email: string;
-  profilePicture: string;
+   _id: string;
+   username: string;
+   email: string;
+   profilePicture: string;
 }
 
 export interface IPaginatedUsers {
-  totalPages: number;
-  users: IUser[];
-  currentPage: number;
-  nextPage: number | null;
-  hasNextPage: boolean;
+   totalPages: number;
+   users: IUser[];
+   currentPage: number;
+   nextPage: number | null;
+   hasNextPage: boolean;
 }
 
 // message types
 interface IReceiver {
-  user: IUser;
-  isMessageRead: boolean;
-  _id: string;
+   user: IUser;
+   isMessageRead: boolean;
+   _id: string;
 }
 
 export interface IMessage {
-  _id: string;
-  chatId: string;
-  content: string;
-  isImage: boolean;
-  isLeaveMessage: boolean;
-  isNewMemberMessage: boolean;
-  sender: IUser;
-  receivers: IReceiver[];
-  createdAt: string;
-  updatedAt: string;
+   _id: string;
+   chatId: string;
+   content: string;
+   isImage: boolean;
+   isLeaveMessage: boolean;
+   isNewMemberMessage: boolean;
+   sender: IUser;
+   receivers: IReceiver[];
+   createdAt: string;
+   updatedAt: string;
 }
 
 export interface INewMessage {
-  chatId: string;
-  content: string | File;
-  isImage: boolean;
+   chatId: string;
+   content: string | File;
+   isImage: boolean;
 }
 
 export interface IFetchedMessage extends IMessage {
-  isSending: boolean;
-  statusId: string;
+   isSending: boolean;
+   statusId: string;
 }
 
 export interface IPaginatedMessages {
-  chatId: string;
-  totalPages: number;
-  totalMessages: number;
-  messages: IMessage[];
-  currentPage: number;
-  nextPage: number | null;
-  hasNextPage: boolean;
+   chatId: string;
+   totalPages: number;
+   totalMessages: number;
+   messages: IMessage[];
+   currentPage: number;
+   nextPage: number | null;
+   hasNextPage: boolean;
 }
 
 export interface IPaginatedFetchedMessages {
-  chatId: string;
-  totalPages: number;
-  totalMessages: number;
-  currentPage: number;
-  nextPage: number | null;
-  hasNextPage: boolean;
-  messages: IFetchedMessage[];
+   chatId: string;
+   totalPages: number;
+   totalMessages: number;
+   currentPage: number;
+   nextPage: number | null;
+   hasNextPage: boolean;
+   messages: IFetchedMessage[];
 }
 
 export interface ISelectedImage {
-  imageId: string;
-  imageFile: File;
+   imageId: string;
+   imageFile: File;
 }
 
 // chat types
 export interface IChatUser {
-  user: IUser;
-  hasLeft: boolean;
-  _id: string;
+   user: IUser;
+   hasLeft: boolean;
+   _id: string;
 }
 
 export interface IChat {
-  _id: string;
-  chatPhoto: string;
-  chatName: string;
-  chatCreator: IUser;
-  isGroupChat: boolean;
-  users: IChatUser[];
-  lastMessage: IMessage | null;
-  createdAt: string;
-  updatedAt: string;
+   _id: string;
+   chatPhoto: string;
+   chatName: string;
+   chatCreator: IUser;
+   isGroupChat: boolean;
+   users: IChatUser[];
+   lastMessage: IMessage | null;
+   createdAt: string;
+   updatedAt: string;
 }
 
 export interface INewChat {
-  chatName: string;
-  isGroupChat: boolean;
-  users: IUser[];
+   chatName: string;
+   isGroupChat: boolean;
+   users: IUser[];
 }
 
 export interface IPaginatedChats {
-  totalPages: number;
-  totalChats: number;
-  chats: IChat[];
-  currentPage: number;
-  nextPage: number | null;
-  hasNextPage: boolean;
+   totalPages: number;
+   totalChats: number;
+   chats: IChat[];
+   currentPage: number;
+   nextPage: number | null;
+   hasNextPage: boolean;
 }
 
 export interface IGoogleCredentials {
-  email: string;
-  username: string;
-  profilePicture: string;
+   email: string;
+   username: string;
+   profilePicture: string;
 }
 
 export interface IShowPasswordState {
-  isShowPassword: boolean;
-  isShowConfirmPassword: boolean;
+   isShowPassword: boolean;
+   isShowConfirmPassword: boolean;
 }
 
 // store types
 export interface IAuthState {
-  user: IUser | null;
-  setCredentials: (credentials: IUser) => void;
-  clearCredentials: () => void;
+   user: IUser | null;
+   setCredentials: (credentials: IUser) => void;
+   clearCredentials: () => void;
 }

@@ -1,8 +1,8 @@
 import {
-  useInfiniteQuery,
-  QueryFunction,
-  UseInfiniteQueryResult,
-  InfiniteData,
+   useInfiniteQuery,
+   QueryFunction,
+   UseInfiniteQueryResult,
+   InfiniteData,
 } from "@tanstack/react-query";
 import { IPaginatedUsers, IResponse, IRequestError } from "@/types";
 import axios from "axios";
@@ -10,27 +10,27 @@ import axios from "axios";
 type TQueryResponse = IResponse<IPaginatedUsers>;
 
 const getUsers: QueryFunction<
-  IPaginatedUsers,
-  [string, string],
-  number
+   IPaginatedUsers,
+   [string, string],
+   number
 > = async ({ queryKey, pageParam }) => {
-  const keyword = queryKey[1];
-  const response = await axios.get<TQueryResponse>(
-    import.meta.env.VITE_API +
-      `/api/user/search?keyword=${keyword}&page=${pageParam}&limit=5`,
-    { withCredentials: true },
-  );
-  return response.data.data;
+   const keyword = queryKey[1];
+   const response = await axios.get<TQueryResponse>(
+      import.meta.env.VITE_API +
+         `/api/user/search?keyword=${keyword}&page=${pageParam}&limit=5`,
+      { withCredentials: true },
+   );
+   return response.data.data;
 };
 
 export const useSearchUsers = (
-  keyword: string,
+   keyword: string,
 ): UseInfiniteQueryResult<InfiniteData<IPaginatedUsers>, IRequestError> => {
-  return useInfiniteQuery({
-    queryKey: ["search-users", keyword],
-    queryFn: getUsers,
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 1,
-    enabled: keyword ? true : false,
-  });
+   return useInfiniteQuery({
+      queryKey: ["search-users", keyword],
+      queryFn: getUsers,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+      initialPageParam: 1,
+      enabled: keyword ? true : false,
+   });
 };

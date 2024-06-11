@@ -5,18 +5,18 @@ import axios from "axios";
 type TQueryResponse = IResponse<IChat>;
 
 const getChat: QueryFunction<IChat, [string, string]> = async ({
-  queryKey,
+   queryKey,
 }) => {
-  const chatId = queryKey[1];
-  const response = await axios.get<TQueryResponse>(
-    import.meta.env.VITE_API + `/api/chats/${chatId}`,
-    { withCredentials: true },
-  );
-  return response.data.data;
+   const chatId = queryKey[1];
+   const response = await axios.get<TQueryResponse>(
+      import.meta.env.VITE_API + `/api/chats/${chatId}`,
+      { withCredentials: true },
+   );
+   return response.data.data;
 };
 
 export const useChat = (
-  chatId: string,
+   chatId: string,
 ): UseQueryResult<IChat, IRequestError> => {
-  return useQuery({ queryKey: ["chats", chatId], queryFn: getChat });
+   return useQuery({ queryKey: ["chats", chatId], queryFn: getChat });
 };

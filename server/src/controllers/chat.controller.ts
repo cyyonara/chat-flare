@@ -11,166 +11,171 @@ import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
 
 // @POST - private - /api/chats
 export const createChat = expressAsyncHandler(async (req: IRequest, res: Response) => {
-  try {
-    const { chatName, users, isGroupChat } = createChatSchema.parse(req.body);
-    const chat = new Chat({
-      chatPhoto: req.user?.profilePicture,
-      chatName,
-      chatCreator: req.user?._id,
-      isGroupChat,
-      users: [
-        { user: req.user?._id, hasLeft: false },
-        ...users.map((user) => ({ user, hasLeft: false })),
-      ],
-    });
-
-    if (isGroupChat) {
-      const newChat = await chat.save();
-      await newChat.populate({
-        path: 'chatCreator users.user',
-        select: '_id username email profilePicture',
-        model: User,
+   try {
+      const { chatName, users, isGroupChat } = createChatSchema.parse(req.body);
+      const chat = new Chat({
+         chatPhoto: req.user?.profilePicture,
+         chatName,
+         chatCreator: req.user?._id,
+         isGroupChat,
+         users: [
+            { user: req.user?._id, hasLeft: false },
+            ...users.map((user) => ({ user, hasLeft: false })),
+         ],
       });
 
-      res
-        .status(201)
-        .json({ success: true, data: newChat, message: 'Group chat created' });
-    } else {
-      if (req.user?._id.toString() === users[0]) {
-        res.status(400);
-        throw new Error('Users cannot duplicate');
-      }
+      if (isGroupChat) {
+         const newChat = await chat.save();
+         await newChat.populate({
+            path: 'chatCreator users.user',
+            select: '_id username email profilePicture',
+            model: User,
+         });
 
-      const singleChat = await Chat.findOne({
-        $and: [
-          { users: { $elemMatch: { user: req.user?._id } } },
-          { users: { $elemMatch: { user: users[0] } } },
-          { isGroupChat: false },
-        ],
-      });
-
-      if (singleChat) {
-        await singleChat.populate({
-          path: 'chatCreator users.user',
-          select: '_id username email profilePicture',
-          model: User,
-        });
-
-        res.status(201).json({ success: true, data: singleChat, message: 'Success' });
+         res.status(201).json({
+            success: true,
+            data: newChat,
+            message: 'Group chat created',
+         });
       } else {
-        const newSingleChat = await chat.save();
-        await newSingleChat.populate({
-          path: 'chatCreator users.user',
-          select: '_id username email profilePicture',
-          model: User,
-        });
+         if (req.user?._id.toString() === users[0]) {
+            res.status(400);
+            throw new Error('Users cannot duplicate');
+         }
 
-        res.status(201).json({
-          success: true,
-          data: newSingleChat,
-          message: 'Chat created successfully',
-        });
+         const singleChat = await Chat.findOne({
+            $and: [
+               { users: { $elemMatch: { user: req.user?._id } } },
+               { users: { $elemMatch: { user: users[0] } } },
+               { isGroupChat: false },
+            ],
+         });
+
+         if (singleChat) {
+            await singleChat.populate({
+               path: 'chatCreator users.user',
+               select: '_id username email profilePicture',
+               model: User,
+            });
+
+            res.status(201).json({ success: true, data: singleChat, message: 'Success' });
+         } else {
+            const newSingleChat = await chat.save();
+            await newSingleChat.populate({
+               path: 'chatCreator users.user',
+               select: '_id username email profilePicture',
+               model: User,
+            });
+
+            res.status(201).json({
+               success: true,
+               data: newSingleChat,
+               message: 'Chat created successfully',
+            });
+         }
       }
-    }
-  } catch (error: any) {
-    let errorMessage: string;
+   } catch (error: any) {
+      let errorMessage: string;
 
-    if (error instanceof ZodError) {
-      errorMessage = fromZodError(error).toString();
-      res.status(400);
-    } else {
-      errorMessage = (error as Error).message;
-    }
+      if (error instanceof ZodError) {
+         errorMessage = fromZodError(error).toString();
+         res.status(400);
+      } else {
+         errorMessage = (error as Error).message;
+      }
 
-    throw new Error(errorMessage);
-  }
+      throw new Error(errorMessage);
+   }
 });
 
 // @GET - private - /api/chats?page=?&limit=?
 export const getChats = expressAsyncHandler(async (req: IRequest, res: Response) => {
-  const { page, limit } = req.query;
-  const { parsedPage, parsedLimit } = parsePaginationData(
-    page as string,
-    limit as string
-  );
+   const { page, limit } = req.query;
+   const { parsedPage, parsedLimit } = parsePaginationData(
+      page as string,
+      limit as string
+   );
 
-  const offset = (parsedPage - 1) * parsedLimit;
-  const chatFilter = {
-    $and: [
-      { users: { $elemMatch: { user: req.user?._id, hasLeft: false } } },
-      {
-        $or: [{ isGroupChat: true }, { isGroupChat: false, lastMessage: { $ne: null } }],
+   const offset = (parsedPage - 1) * parsedLimit;
+   const chatFilter = {
+      $and: [
+         { users: { $elemMatch: { user: req.user?._id, hasLeft: false } } },
+         {
+            $or: [
+               { isGroupChat: true },
+               { isGroupChat: false, lastMessage: { $ne: null } },
+            ],
+         },
+      ],
+   };
+
+   const chats = await Chat.find(chatFilter)
+      .sort({ updatedAt: -1 })
+      .limit(parsedLimit)
+      .skip(offset)
+      .populate({
+         path: 'chatCreator users.user',
+         select: '_id username email profilePicture',
+         model: User,
+      })
+      .populate({
+         path: 'lastMessage',
+         model: Message,
+         populate: {
+            path: 'sender receivers.user',
+            select: '_id username email profilePicture',
+            model: User,
+         },
+      });
+
+   const chatsCount = await Chat.countDocuments(chatFilter);
+   const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
+      chatsCount,
+      parsedLimit,
+      parsedPage
+   );
+
+   res.status(200).json({
+      success: true,
+      data: {
+         totalPages,
+         totalChats: chatsCount,
+         chats,
+         currentPage: parsedPage,
+         nextPage,
+         hasNextPage,
       },
-    ],
-  };
-
-  const chats = await Chat.find(chatFilter)
-    .sort({ updatedAt: -1 })
-    .limit(parsedLimit)
-    .skip(offset)
-    .populate({
-      path: 'chatCreator users.user',
-      select: '_id username email profilePicture',
-      model: User,
-    })
-    .populate({
-      path: 'lastMessage',
-      model: Message,
-      populate: {
-        path: 'sender receivers.user',
-        select: '_id username email profilePicture',
-        model: User,
-      },
-    });
-
-  const chatsCount = await Chat.countDocuments(chatFilter);
-  const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
-    chatsCount,
-    parsedLimit,
-    parsedPage
-  );
-
-  res.status(200).json({
-    success: true,
-    data: {
-      totalPages,
-      totalChats: chatsCount,
-      chats,
-      currentPage: parsedPage,
-      nextPage,
-      hasNextPage,
-    },
-    message: 'Success',
-  });
+      message: 'Success',
+   });
 });
 
 // @GET - private - /api/chats/:chatId
 export const getChat = expressAsyncHandler(async (req: IRequest, res: Response) => {
-  const { chatId } = req.params;
+   const { chatId } = req.params;
 
-  const chat = await Chat.findOne({
-    _id: chatId,
-    users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
-  })
-    .populate({
-      path: 'chatCreator users.user',
-      select: '_id username email profilePicture',
-      model: User,
-    })
-    .populate({
-      path: 'lastMessage',
-      model: Message,
-      populate: {
-        path: 'sender receivers.user',
-        select: '_id username email profilePicture',
-        model: User,
-      },
-    });
+   const chat = await Chat.findOne({
+      _id: chatId,
+      users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
+   })
+      .populate({
+         path: 'chatCreator users.user',
+         select: '_id username email profilePicture',
+         model: User,
+      })
+      .populate({
+         path: 'lastMessage',
+         model: Message,
+         populate: {
+            path: 'sender receivers.user',
+            select: '_id username email profilePicture',
+            model: User,
+         },
+      });
 
-  if (!chat) {
-    res.status(404);
-    throw new Error('Chat not found');
-  }
+   if (!chat) {
+      res.status(404);
+      throw new Error('Chat not found');
+   }
 
-  res.status(200).json({ success: true, data: chat, message: 'Success' });
+   res.status(200).json({ success: true, data: chat, message: 'Success' });
 });

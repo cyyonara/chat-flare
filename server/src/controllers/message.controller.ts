@@ -11,121 +11,121 @@ import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
 
 // @POST - private - /api/messages/:chatId
 export const addMessage = expressAsyncHandler(async (req: IRequest, res: Response) => {
-  try {
-    const { content, isImage } = addMessageSchema.parse(req.body);
-    const { chatId } = req.params;
+   try {
+      const { content, isImage } = addMessageSchema.parse(req.body);
+      const { chatId } = req.params;
 
-    const chat = await Chat.findOne({
-      _id: chatId,
-      users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
-    });
+      const chat = await Chat.findOne({
+         _id: chatId,
+         users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
+      });
 
-    if (!chat) {
-      res.status(404);
-      throw new Error('Chat not found');
-    }
+      if (!chat) {
+         res.status(404);
+         throw new Error('Chat not found');
+      }
 
-    const messageReceivers = chat.users.filter(
-      (user) => user.user.toString() !== req.user?._id.toString()
-    );
+      const messageReceivers = chat.users.filter(
+         (user) => user.user.toString() !== req.user?._id.toString()
+      );
 
-    const message = new Message({
-      chatId,
-      content,
-      isImage,
-      sender: req.user?._id,
-      receivers: messageReceivers,
-    });
+      const message = new Message({
+         chatId,
+         content,
+         isImage,
+         sender: req.user?._id,
+         receivers: messageReceivers,
+      });
 
-    await message.save();
-    chat.lastMessage = message._id;
+      await message.save();
+      chat.lastMessage = message._id;
 
-    const updatedChat = await chat.save();
+      const updatedChat = await chat.save();
 
-    await updatedChat.populate({
-      path: 'chatCreator users.user',
-      select: '_id username email profilePicture',
-      model: User,
-    });
+      await updatedChat.populate({
+         path: 'chatCreator users.user',
+         select: '_id username email profilePicture',
+         model: User,
+      });
 
-    await updatedChat.populate({
-      path: 'lastMessage',
-      model: Message,
-      populate: {
-        path: 'sender receivers.user',
-        select: '_id username email profilePicture',
-        model: User,
-      },
-    });
+      await updatedChat.populate({
+         path: 'lastMessage',
+         model: Message,
+         populate: {
+            path: 'sender receivers.user',
+            select: '_id username email profilePicture',
+            model: User,
+         },
+      });
 
-    res.status(201).json({
-      success: true,
-      data: updatedChat,
-      message: 'Message saved successfully',
-    });
-  } catch (error: any) {
-    let errorMessage: string;
+      res.status(201).json({
+         success: true,
+         data: updatedChat,
+         message: 'Message saved successfully',
+      });
+   } catch (error: any) {
+      let errorMessage: string;
 
-    if (error instanceof ZodError) {
-      res.status(400);
-      errorMessage = fromZodError(error).toString();
-    } else {
-      errorMessage = (error as Error).message;
-    }
+      if (error instanceof ZodError) {
+         res.status(400);
+         errorMessage = fromZodError(error).toString();
+      } else {
+         errorMessage = (error as Error).message;
+      }
 
-    throw new Error(errorMessage);
-  }
+      throw new Error(errorMessage);
+   }
 });
 
 // @GET - private - /api/messages/:chatId?page=?&limit=?
 export const getChatMessages = expressAsyncHandler(
-  async (req: IRequest, res: Response) => {
-    const { page, limit } = req.query;
-    const { chatId } = req.params;
-    const { parsedPage, parsedLimit } = parsePaginationData(
-      page as string,
-      limit as string
-    );
+   async (req: IRequest, res: Response) => {
+      const { page, limit } = req.query;
+      const { chatId } = req.params;
+      const { parsedPage, parsedLimit } = parsePaginationData(
+         page as string,
+         limit as string
+      );
 
-    const isChatExists = await Chat.exists({
-      _id: chatId,
-      users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
-    });
-
-    if (!isChatExists) {
-      res.status(404);
-      throw new Error('Messages not found');
-    }
-
-    const offset = (parsedPage - 1) * parsedLimit;
-    const messages = await Message.find({ chatId })
-      .skip(offset)
-      .limit(parsedLimit)
-      .sort({ createdAt: -1 })
-      .populate({
-        path: 'sender receivers.user',
-        select: '_id username email profilePicture',
-        model: User,
+      const isChatExists = await Chat.exists({
+         _id: chatId,
+         users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
       });
 
-    const messagesCount = await Message.countDocuments({ chatId });
-    const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
-      messagesCount,
-      parsedLimit,
-      parsedPage
-    );
+      if (!isChatExists) {
+         res.status(404);
+         throw new Error('Messages not found');
+      }
 
-    res.status(200).json({
-      success: true,
-      data: {
-        chatId,
-        totalPages,
-        totalMessages: messagesCount,
-        messages,
-        currentPage: parsedPage,
-        nextPage,
-        hasNextPage,
-      },
-    });
-  }
+      const offset = (parsedPage - 1) * parsedLimit;
+      const messages = await Message.find({ chatId })
+         .skip(offset)
+         .limit(parsedLimit)
+         .sort({ createdAt: -1 })
+         .populate({
+            path: 'sender receivers.user',
+            select: '_id username email profilePicture',
+            model: User,
+         });
+
+      const messagesCount = await Message.countDocuments({ chatId });
+      const { nextPage, hasNextPage, totalPages } = getPaginationResponse(
+         messagesCount,
+         parsedLimit,
+         parsedPage
+      );
+
+      res.status(200).json({
+         success: true,
+         data: {
+            chatId,
+            totalPages,
+            totalMessages: messagesCount,
+            messages,
+            currentPage: parsedPage,
+            nextPage,
+            hasNextPage,
+         },
+      });
+   }
 );
