@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/custom/useDebounce";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
 import { useInView } from "react-intersection-observer";
 import InputIcon from "@/components/common/InputIcon";
@@ -35,6 +35,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
       fetchNextPage,
       refetch,
    } = useSearchUsers(debounceValue);
+   const [disableMessageButton, setDisableMessageButton] = useState(false);
    const { inView, ref } = useInView();
    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -80,7 +81,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
                         {isFetching && <UserResultSkeleton count={1} />}
                         {isError && <UserSearchError retry={() => refetch()} />}
                         {isSuccess && (
-                           <React.Fragment>
+                           <>
                               {!data.pages[0].users.length ? (
                                  <p className="text-center">No users found</p>
                               ) : (
@@ -92,12 +93,19 @@ export default function SearchUserModal({ closeModal }: IProps) {
                                           username={user.username}
                                           email={user.email}
                                           profilePicture={user.profilePicture}
+                                          disableMessageButton={
+                                             disableMessageButton
+                                          }
+                                          setDisableMessageButton={(state) =>
+                                             setDisableMessageButton(state)
+                                          }
+                                          closeModal={closeModal}
                                        />
                                     )),
                                  )
                               )}
                               <div ref={ref}></div>
-                           </React.Fragment>
+                           </>
                         )}
                      </div>
                   </div>

@@ -36,6 +36,11 @@ interface IReceiver {
    _id: string;
 }
 
+export interface IMessageReactor {
+   user: IUser;
+   reaction: string;
+}
+
 export interface IMessage {
    _id: string;
    chatId: string;
@@ -45,6 +50,7 @@ export interface IMessage {
    isNewMemberMessage: boolean;
    sender: IUser;
    receivers: IReceiver[];
+   reactors: IMessageReactor[];
    createdAt: string;
    updatedAt: string;
 }
@@ -78,11 +84,6 @@ export interface IPaginatedFetchedMessages {
    nextPage: number | null;
    hasNextPage: boolean;
    messages: IFetchedMessage[];
-}
-
-export interface ISelectedImage {
-   imageId: string;
-   imageFile: File;
 }
 
 // chat types

@@ -38,16 +38,12 @@ export default function Signup({}: IProps) {
    const navigate = useNavigate();
    const { toast } = useToast();
 
-   useEffect(() => {
-      document.title = "Sign up";
-   }, []);
-
    const setGoogleSignupState = useCallback(
       (state: boolean): void => setIsGoogleSignupLoading(state),
       [],
    );
 
-   const handleSignup: SubmitHandler<ISignupFields> = (formData): void => {
+   const handleSignup: SubmitHandler<ISignupFields> = (formData) => {
       mutate(formData, {
          onSuccess: (data): void => {
             navigate("/account/set-up", {
@@ -64,6 +60,10 @@ export default function Signup({}: IProps) {
          },
       });
    };
+
+   useEffect(() => {
+      document.title = "Sign up";
+   }, []);
 
    return (
       <motion.div

@@ -53,20 +53,15 @@ export default function CreateGroupModal({ closeModal }: IProps) {
    const queryClient = useQueryClient();
    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-   const handleSelectedUsers = useCallback(
-      (checked: boolean, user: IUser): void => {
-         if (checked) {
-            setSelectedUsers((prev) => [...prev, user]);
-         } else {
-            setSelectedUsers((prev) =>
-               prev.filter(({ _id }) => _id !== user._id),
-            );
-         }
-      },
-      [],
-   );
+   const handleSelectedUsers = useCallback((checked: boolean, user: IUser) => {
+      if (checked) {
+         setSelectedUsers((prev) => [...prev, user]);
+      } else {
+         setSelectedUsers((prev) => prev.filter(({ _id }) => _id !== user._id));
+      }
+   }, []);
 
-   const handleCreateGroupChat = (): void => {
+   const handleCreateGroupChat = () => {
       if (groupName && selectedUsers.length) {
          mutate(
             { chatName: groupName, isGroupChat: true, users: selectedUsers },

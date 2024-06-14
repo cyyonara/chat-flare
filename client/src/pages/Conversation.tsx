@@ -12,17 +12,17 @@ export default function Conversation({}: IProps) {
 
    return (
       <div className="flex flex-1">
-         <div className="flex flex-1 flex-col">
+         <main className="flex flex-1 flex-col">
             <ConversationHeader
                chat={data}
                isLoading={isLoading}
                isSuccess={isSuccess}
             />
-            <main className="flex flex-1 flex-col overflow-y-auto">
+            <section className="flex flex-1 flex-col overflow-y-auto">
                <MessagesContainer isFetchingChatSuccess={isSuccess} />
                <MessageInput isSuccess={isSuccess} />
-            </main>
-         </div>
+            </section>
+         </main>
          <div className="w-[350px] border-l"></div>
       </div>
    );

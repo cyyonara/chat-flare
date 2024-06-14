@@ -43,6 +43,19 @@ const messageSchema = new Schema(
          ],
          required: true,
       },
+      reactors: {
+         type: [
+            {
+               reaction: {
+                  type: Schema.Types.String,
+                  required: true,
+               },
+               user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+            },
+         ],
+         required: false,
+         default: [],
+      },
    },
    { timestamps: true }
 );

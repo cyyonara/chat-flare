@@ -34,11 +34,7 @@ export default function Login({}: IProps) {
    });
    const { toast } = useToast();
 
-   useEffect(() => {
-      document.title = "Login";
-   }, []);
-
-   const login: SubmitHandler<ILoginFields> = (formData): void => {
+   const login: SubmitHandler<ILoginFields> = (formData) => {
       mutate(formData, {
          onSuccess: (data) => setCredentials(data),
          onError: (error) => {
@@ -51,9 +47,13 @@ export default function Login({}: IProps) {
    };
 
    const setGoogleLoginState = useCallback(
-      (loadingState: boolean): void => setGoogleLoginLoading(loadingState),
+      (loadingState: boolean) => setGoogleLoginLoading(loadingState),
       [],
    );
+
+   useEffect(() => {
+      document.title = "Login";
+   }, []);
 
    return (
       <motion.div

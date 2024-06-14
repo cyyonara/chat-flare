@@ -3,7 +3,7 @@ import { IRequest } from '../utils/types';
 import { Response } from 'express';
 import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
-import { addMessageSchema } from '../utils/validations';
+import { addMessageSchema, messageReactionSchema } from '../utils/validations';
 import { Chat } from '../models/chat.model';
 import expressAsyncHandler from 'express-async-handler';
 import { User } from '../models/user.model';
@@ -52,7 +52,7 @@ export const addMessage = expressAsyncHandler(async (req: IRequest, res: Respons
          path: 'lastMessage',
          model: Message,
          populate: {
-            path: 'sender receivers.user',
+            path: 'sender receivers.user reactors.user',
             select: '_id username email profilePicture',
             model: User,
          },
@@ -103,7 +103,7 @@ export const getChatMessages = expressAsyncHandler(
          .limit(parsedLimit)
          .sort({ createdAt: -1 })
          .populate({
-            path: 'sender receivers.user',
+            path: 'sender receivers.user reactors.user',
             select: '_id username email profilePicture',
             model: User,
          });
@@ -127,5 +127,86 @@ export const getChatMessages = expressAsyncHandler(
             hasNextPage,
          },
       });
+   }
+);
+
+// @PATCH - private - /api/messages/:messageId/reaction
+export const updateMessageReactions = expressAsyncHandler(
+   async (req: IRequest, res: Response) => {
+      try {
+         const { reaction: newReaction } = messageReactionSchema.parse(req.body);
+         const { messageId } = req.params;
+         const currentUserId = req.user?._id;
+
+         const message = await Message.findOne({
+            $and: [
+               {
+                  _id: messageId,
+                  $or: [
+                     { receivers: { $elemMatch: { user: currentUserId } } },
+                     { sender: currentUserId },
+                  ],
+               },
+            ],
+         });
+
+         if (message) {
+            const isAlreadyReacted = message.reactors?.find(
+               (reactor) => reactor.user.toString() === currentUserId?.toString()
+            );
+
+            type Reactors = typeof message.reactors;
+
+            if (isAlreadyReacted) {
+               const { reaction } = isAlreadyReacted;
+
+               if (reaction === newReaction) {
+                  message.reactors = message.reactors!.filter(
+                     (reactor) => reactor.user.toString() !== currentUserId?.toString()
+                  ) as Reactors;
+               } else {
+                  message.reactors = message.reactors?.map((reactor) => {
+                     if (reactor.user.toString() === currentUserId?.toString()) {
+                        return { ...reactor, reaction: newReaction };
+                     } else {
+                        return reactor;
+                     }
+                  }) as Reactors;
+               }
+            } else {
+               message.reactors?.push({
+                  user: currentUserId,
+                  reaction: newReaction,
+               });
+            }
+
+            const updatedMessage = await message.save();
+            await updatedMessage.populate({
+               path: 'sender receivers.user reactors.user',
+               select: '_id username email profilePicture',
+               model: User,
+            });
+
+            res.status(201).json({
+               success: true,
+               data: updatedMessage,
+               message: 'Message updated successfully.',
+            });
+         } else {
+            res.status(404);
+            throw new Error('Message is not existing');
+         }
+      } catch (error: any) {
+         let errorMessage: string;
+
+         if (error instanceof ZodError) {
+            res.status(400);
+            errorMessage = fromZodError(error).toString();
+         } else {
+            errorMessage = (error as Error).message;
+         }
+
+         throw new Error(errorMessage);
+      }
    }
 );

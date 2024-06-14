@@ -9,6 +9,12 @@ import {
    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
+import { MdEmojiEmotions } from "react-icons/md";
+import { useMemo, useState } from "react";
+import ReactionPicker from "@/components/chats/ReactionPicker";
+import { AnimatePresence } from "framer-motion";
+import MessageReactions from "@/components/chats/MessageReactions";
+import ReactorsList from "./ReactorsList";
 
 interface IProps extends IFetchedMessage {
    pageIndex: number;
@@ -18,6 +24,7 @@ interface IProps extends IFetchedMessage {
 }
 
 export default function Message({
+   _id,
    content,
    isImage,
    isLeaveMessage,
@@ -28,8 +35,11 @@ export default function Message({
    pageIndex,
    pages,
    totalPages,
+   reactors,
 }: IProps) {
-   const currentUserId = useAuth((state) => state.user?._id);
+   const [showReactionPicker, setShowReactionPicker] = useState<boolean>(false);
+   const [showReactorsList, setShowReactorsList] = useState<boolean>(false);
+   const currentUserId = useAuth((state) => state.user!._id);
 
    const displayProfile = (): boolean => {
       if (currentUserId !== sender._id) {
@@ -266,6 +276,8 @@ export default function Message({
       }
    };
 
+   const renderProfile = useMemo(() => displayProfile(), []);
+
    if (isLeaveMessage) {
       return <div className="flex">someone leave the group</div>;
    }
@@ -275,58 +287,118 @@ export default function Message({
    }
 
    return (
-      <div
-         className={cn("flex", {
-            "mb-auto": !pageIndex && !messageIndex,
-         })}
-      >
-         {displayProfile() ? (
-            <TooltipProvider>
-               <Tooltip>
-                  <TooltipTrigger asChild>
-                     <Avatar className="mb-[2px] mr-3 mt-auto size-[30px]">
-                        <AvatarImage src={sender.profilePicture} className="" />
-                        <AvatarFallback className="text-base uppercase">
-                           {sender.username.substring(0, 2)}
-                        </AvatarFallback>
-                     </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent>{sender.username}</TooltipContent>
-               </Tooltip>
-            </TooltipProvider>
-         ) : (
-            <div className="mb-[2px] mr-3 mt-auto size-[30px]"></div>
-         )}
+      <>
+         <AnimatePresence>
+            {showReactorsList && (
+               <ReactorsList
+                  reactors={reactors}
+                  close={() => setShowReactorsList(false)}
+               />
+            )}
+         </AnimatePresence>
          <div
-            className={cn({
-               "ml-auto flex items-end gap-x-1": sender._id === currentUserId,
+            className={cn("w-full flex items-center", {
+               "mb-auto": !pageIndex && !messageIndex,
+               "pb-3": reactors.length > 0,
             })}
          >
-            {isImage ? (
-               <img
-                  src={content}
-                  className="max-w-[250px] rounded-lg object-contain"
-               />
-            ) : (
+            <div
+               className={cn("flex gap-x-2 items-end", {
+                  "ml-auto": sender._id === currentUserId,
+               })}
+            >
+               {renderProfile ? (
+                  <TooltipProvider>
+                     <Tooltip>
+                        <TooltipTrigger>
+                           <Avatar className="size-[30px]">
+                              <AvatarImage src={sender.profilePicture} />
+                              <AvatarFallback className="uppercase">
+                                 {sender.username.substring(0, 2)}
+                              </AvatarFallback>
+                           </Avatar>
+                        </TooltipTrigger>
+                        <TooltipContent>{sender.username}</TooltipContent>
+                     </Tooltip>
+                  </TooltipProvider>
+               ) : (
+                  <div className="size-[30px]"></div>
+               )}
                <div
-                  className={cn(
-                     "max-w-[400px] rounded-lg bg-primary px-4 py-3 text-xs font-semibold text-secondary",
-                     {
-                        "bg-secondary text-primary":
-                           sender._id !== currentUserId,
-                     },
-                  )}
+                  className={cn("flex items-center gap-x-2 group", {
+                     "flex-row-reverse": sender._id === currentUserId,
+                  })}
                >
-                  {content}
+                  <div className="relative">
+                     {isImage ? (
+                        <img
+                           src={content}
+                           alt={_id}
+                           className="object-center object-contain max-w-[300px] rounded-lg"
+                        />
+                     ) : (
+                        <div
+                           className={cn(
+                              "bg-secondary rounded-lg py-2 px-3 text-sm text-primary font-semibold",
+                              {
+                                 "bg-primary text-secondary":
+                                    sender._id === currentUserId,
+                              },
+                           )}
+                        >
+                           {content}
+                        </div>
+                     )}
+                     {reactors.length > 0 && (
+                        <MessageReactions
+                           reactors={reactors}
+                           variant={
+                              currentUserId === sender._id
+                                 ? "secondary"
+                                 : "primary"
+                           }
+                           position={
+                              currentUserId === sender._id ? "left" : "right"
+                           }
+                           showReactorsList={() => setShowReactorsList(true)}
+                        />
+                     )}
+                  </div>
+                  <AnimatePresence>
+                     {showReactionPicker && (
+                        <ReactionPicker
+                           messageId={_id}
+                           currentUserId={currentUserId}
+                           reactors={reactors}
+                           closeReactionPicker={() =>
+                              setShowReactionPicker(false)
+                           }
+                        />
+                     )}
+                  </AnimatePresence>
+                  <div
+                     className={cn("hidden", {
+                        "group-hover:flex": !showReactionPicker && !isSending,
+                     })}
+                  >
+                     <TooltipProvider>
+                        <Tooltip>
+                           <TooltipTrigger
+                              className="bg-secondary p-1 rounded-full"
+                              onClick={() => setShowReactionPicker(true)}
+                           >
+                              <MdEmojiEmotions size={12} />
+                           </TooltipTrigger>
+                           <TooltipContent className="text-xs">
+                              Add Reaction
+                           </TooltipContent>
+                        </Tooltip>
+                     </TooltipProvider>
+                  </div>
                </div>
-            )}
-            {isSending && (
-               <Loader2
-                  size={10}
-                  className="mb-[2px] animate-spin text-white"
-               />
-            )}
+               {isSending && <Loader2 size={12} className="animate-spin" />}
+            </div>
          </div>
-      </div>
+      </>
    );
 }

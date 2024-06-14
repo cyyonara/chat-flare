@@ -1,22 +1,62 @@
 import { IUser } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageCircleMoreIcon } from "lucide-react";
+import { MessageCircleMoreIcon, Loader2 } from "lucide-react";
+import { v4 as uuid } from "uuid";
+import { useNavigate } from "react-router-dom";
 import {
    Tooltip,
    TooltipProvider,
    TooltipContent,
    TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useCreateChat } from "@/hooks/api/useCreateChat";
+import { useToast } from "@/components/ui/use-toast";
 
-interface IProps extends IUser {}
+interface IProps extends IUser {
+   disableMessageButton: boolean;
+   setDisableMessageButton: (state: boolean) => void;
+   closeModal: () => void;
+}
 
 export default function UserResult({
    _id,
    username,
    email,
    profilePicture,
+   disableMessageButton,
+   setDisableMessageButton,
+   closeModal,
 }: IProps) {
+   const { mutate, isPending } = useCreateChat();
+   const { toast } = useToast();
+   const navigate = useNavigate();
+
+   const handleMessageUser = () => {
+      setDisableMessageButton(true);
+      mutate(
+         {
+            chatName: uuid(),
+            isGroupChat: false,
+            users: [{ _id, username, email, profilePicture }],
+         },
+         {
+            onSuccess: (data) => {
+               navigate(`/chats/${data._id}`);
+               closeModal();
+            },
+            onError: (error) => {
+               toast({
+                  title: "Oops!",
+                  description:
+                     error.response?.data.message || "Something went wrong.",
+               });
+            },
+            onSettled: () => setDisableMessageButton(false),
+         },
+      );
+   };
+
    return (
       <div className="flex items-center gap-x-2 rounded-md p-2 shadow-[0_0_3px_rgba(40,40,40,0.4)]">
          <Avatar>
@@ -32,8 +72,16 @@ export default function UserResult({
          <TooltipProvider>
             <Tooltip>
                <TooltipTrigger asChild>
-                  <Button className="p-3">
-                     <MessageCircleMoreIcon size={20} />
+                  <Button
+                     disabled={disableMessageButton}
+                     className="p-3"
+                     onClick={handleMessageUser}
+                  >
+                     {isPending ? (
+                        <Loader2 size={20} className="animate-spin" />
+                     ) : (
+                        <MessageCircleMoreIcon size={20} />
+                     )}
                   </Button>
                </TooltipTrigger>
                <TooltipContent>

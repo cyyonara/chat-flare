@@ -122,7 +122,7 @@ export const getChats = expressAsyncHandler(async (req: IRequest, res: Response)
          path: 'lastMessage',
          model: Message,
          populate: {
-            path: 'sender receivers.user',
+            path: 'sender receivers.user reactors.user',
             select: '_id username email profilePicture',
             model: User,
          },

@@ -62,6 +62,34 @@ export default function SocketProvider({}: IProps) {
    useEffect(() => {
       socket.on("new-message", (updatedChat: IChat) => {
          if (isInChat(updatedChat, currentUserId)) {
+            queryClient.setQueryData(
+               ["chats"],
+               (
+                  queryData: InfiniteData<IPaginatedChats>,
+               ): InfiniteData<IPaginatedChats> => {
+                  const filteredPages = queryData.pages.map((page) => ({
+                     ...page,
+                     chats: page.chats.filter(
+                        (chat) => chat._id !== updatedChat._id,
+                     ),
+                  }));
+
+                  return {
+                     ...queryData,
+                     pages: filteredPages.map((page, i) => {
+                        if (!i) {
+                           return {
+                              ...page,
+                              chats: [updatedChat, ...page.chats],
+                           };
+                        } else {
+                           return page;
+                        }
+                     }),
+                  };
+               },
+            );
+
             if (chatId === updatedChat._id) {
                queryClient.setQueryData(
                   ["messages", updatedChat._id],

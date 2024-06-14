@@ -28,7 +28,7 @@ const AccountSetup: React.FC<IProps> = () => {
 
    if (!userCredentials) return <Navigate to="/" replace />;
 
-   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
          const imageFile: File = e.target.files[0];
 
@@ -44,7 +44,7 @@ const AccountSetup: React.FC<IProps> = () => {
       }
    };
 
-   const setupAccount = (): void => {
+   const setupAccount = () => {
       if (imageFile) {
          mutate(imageFile, {
             onSuccess: (data) => {

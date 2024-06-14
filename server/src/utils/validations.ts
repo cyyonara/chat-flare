@@ -95,3 +95,16 @@ export const addMessageSchema = z
       },
       { message: 'Image must have a url content', path: ['content', 'isImage'] }
    );
+
+export const messageReactionSchema = z.object({
+   reaction: z
+      .string()
+      .refine((data) => data.length, { message: 'Reaction required' })
+      .refine(
+         (data) => {
+            const reactions: string[] = ['❤️', '😄', '😮', '😢', '😠', '👍', '👎'];
+            return !!reactions.find((reaction) => reaction === data);
+         },
+         { message: 'Invalid reaction' }
+      ),
+});

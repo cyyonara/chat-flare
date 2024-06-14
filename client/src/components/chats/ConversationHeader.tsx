@@ -37,18 +37,18 @@ export default function ConversationHeader({
                   src={
                      chat?.isGroupChat
                         ? chat.chatPhoto
-                        : userInfo.user.profilePicture
+                        : userInfo!.user.profilePicture
                   }
                />
                <AvatarFallback className="uppercase">
                   {chat?.isGroupChat
                      ? chat.chatName.substring(0, 2)
-                     : userInfo.user.username.substring(0, 2)}
+                     : userInfo!.user.username.substring(0, 2)}
                </AvatarFallback>
             </Avatar>
             <div className="flex flex-col justify-center">
                <p className="font-semibold">
-                  {chat?.isGroupChat ? chat.chatName : userInfo.user.username}
+                  {chat?.isGroupChat ? chat.chatName : userInfo!.user.username}
                </p>
                {chat?.isGroupChat && (
                   <p className="text-xs text-muted-foreground">

@@ -18,10 +18,10 @@ export default memo(function GoogleSignupButton({
    const { toast } = useToast();
    const navigate = useNavigate();
 
-   const handleGoogleSignup = (): void => {
+   const handleGoogleSignup = () => {
       setGoogleSignupState(true);
       mutate(null, {
-         onSuccess: (data): void => {
+         onSuccess: (data) => {
             navigate("/account/set-up", {
                replace: true,
                state: data,
@@ -34,7 +34,7 @@ export default memo(function GoogleSignupButton({
                   error.response?.data.message || "Something went wrong",
             });
          },
-         onSettled: (): void => setGoogleSignupState(false),
+         onSettled: () => setGoogleSignupState(false),
       });
    };
 

@@ -3,9 +3,10 @@ import { motion } from "framer-motion";
 
 interface IProps {
    children: React.ReactNode;
+   onClick?: () => void;
 }
 
-export default function Overlay({ children }: IProps) {
+export default function Overlay({ children, onClick }: IProps) {
    useEffect(() => {
       document.body.style.overflow = "hidden";
 
@@ -21,6 +22,7 @@ export default function Overlay({ children }: IProps) {
          animate={{ opacity: 1 }}
          exit={{ opacity: 0 }}
          transition={{ duration: 0.2 }}
+         onClick={onClick}
       >
          {children}
       </motion.div>
