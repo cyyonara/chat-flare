@@ -2,6 +2,7 @@ import { IChat, IChatUser } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getChatMateInfo } from "@/lib/helpers";
+import { ReactNode } from "react";
 
 interface IProps {
    chat: IChat | undefined;
@@ -14,8 +15,8 @@ export default function ConversationHeader({
    isLoading,
    isSuccess,
 }: IProps) {
-   let headerContent: React.ReactNode;
    const userInfo = getChatMateInfo(chat?.users as IChatUser[]);
+   let headerContent: ReactNode;
 
    if (isLoading) {
       headerContent = (

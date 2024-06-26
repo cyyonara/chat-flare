@@ -3,7 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { useGoogleLogin } from "@/hooks/api/useGoogleLogin";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 
 interface IProps {
    isLoginLoading: boolean;

@@ -17,7 +17,7 @@ import { checkImage } from "@/lib/helpers";
 import { useSendMessage } from "@/hooks/api/useSendMessage";
 import { useQueryClient, InfiniteData } from "@tanstack/react-query";
 import { IPaginatedChats, IPaginatedFetchedMessages, IUser } from "@/types";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 import { socket } from "@/components/providers/SocketProvider";
 
 interface IProps {

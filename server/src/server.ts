@@ -55,4 +55,8 @@ io.on('connection', (socket) => {
    socket.on('new-message', (updatedChat) => {
       socket.broadcast.emit('new-message', updatedChat);
    });
+
+   socket.on('update-message-reaction', (updatedMessage) => {
+      socket.broadcast.emit('update-message-reaction', updatedMessage);
+   });
 });

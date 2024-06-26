@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/schemas";
 import { useLogin } from "@/hooks/api/useLogin";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 import { Loader2Icon } from "lucide-react";
 import { motion } from "framer-motion";
 import InputIcon from "@/components/common/InputIcon";

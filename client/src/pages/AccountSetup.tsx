@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { Settings } from "lucide-react";
 import { useSetup } from "@/hooks/api/useSetup";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 
 interface IProps {}
 

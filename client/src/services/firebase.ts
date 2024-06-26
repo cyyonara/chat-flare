@@ -1,4 +1,4 @@
-import { auth, googleProvider, storage } from "@/firebase.config";
+import { auth, googleProvider, storage } from "@/config/firebase.config";
 import { IGoogleCredentials } from "@/types";
 import { signInWithPopup, UserCredential } from "firebase/auth";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";

@@ -5,16 +5,15 @@ import {
    QueryFunction,
 } from "@tanstack/react-query";
 import { IResponse, IPaginatedChats, IRequestError } from "@/types";
-import axios from "axios";
+import { api } from "@/config/axios.config";
 
 type TQueryResponse = IResponse<IPaginatedChats>;
 
 const getChats: QueryFunction<IPaginatedChats, [string], number> = async ({
    pageParam,
 }) => {
-   const response = await axios.get<TQueryResponse>(
-      import.meta.env.VITE_API + `/api/chats?page=${pageParam}&limit=10`,
-      { withCredentials: true },
+   const response = await api.get<TQueryResponse>(
+      `/api/chats?page=${pageParam}&limit=10`,
    );
    return response.data.data;
 };

@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useDebounce } from "@/hooks/custom/useDebounce";
+import { useDebounce } from "@/hooks/states/useDebounce";
 import { useState, useEffect, useRef } from "react";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
 import { useInView } from "react-intersection-observer";

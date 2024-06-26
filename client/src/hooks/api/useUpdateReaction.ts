@@ -4,7 +4,7 @@ import {
    UseMutationResult,
 } from "@tanstack/react-query";
 import { IMessage, IRequestError, IResponse } from "@/types";
-import axios from "axios";
+import { api } from "@/config/axios.config";
 
 type TMutationResponse = IResponse<IMessage>;
 
@@ -12,10 +12,9 @@ const updateReaction: MutationFunction<IMessage, [string, string]> = async ([
    reaction,
    messageId,
 ]) => {
-   const response = await axios.patch<TMutationResponse>(
-      import.meta.env.VITE_API + `/api/messages/${messageId}/reaction`,
+   const response = await api.patch<TMutationResponse>(
+      `/api/messages/${messageId}/reaction`,
       { reaction },
-      { withCredentials: true },
    );
    return response.data.data;
 };

@@ -32,10 +32,10 @@ export default function MessageReactions({
    return (
       <div
          className={cn(
-            "bg-primary text-secondary absolute z-10 flex items-center gap-x-[2px] top-[calc(100%-4px)] left-[calc(100%-16px)] rounded-full py-[2px] px-1 cursor-pointer",
+            "bg-primary text-secondary absolute z-10 flex items-center gap-x-[2px] top-[calc(100%-4px)] left-[calc(100%-16px)] rounded-full py-[2px] px-1 cursor-pointer text-white",
             {
                "right-[calc(100%-18px)] left-auto": position === "left",
-               "bg-secondary text-primary": variant === "secondary",
+               "bg-secondary": variant === "secondary",
             },
          )}
          onClick={showReactorsList}

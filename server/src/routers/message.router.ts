@@ -6,15 +6,15 @@ import {
    updateMessageReactions,
 } from '../controllers/message.controller';
 
-const messageRouter = Router();
+const router = Router();
 
 // @POST - private - /api/messages/:chatId
-messageRouter.post('/:chatId', verify, addMessage);
+router.post('/:chatId', verify, addMessage);
 
 // @GET - private - /api/messages/:chatId
-messageRouter.get('/:chatId', verify, getChatMessages);
+router.get('/:chatId', verify, getChatMessages);
 
 // @PATCH - private - /api/messages/:messageId/reaction
-messageRouter.patch('/:messageId/reaction', verify, updateMessageReactions);
+router.patch('/:messageId/reaction', verify, updateMessageReactions);
 
-export default messageRouter;
+export default router;

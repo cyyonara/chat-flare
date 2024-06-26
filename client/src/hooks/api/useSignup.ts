@@ -4,12 +4,12 @@ import {
    UseMutationResult,
 } from "@tanstack/react-query";
 import { ISignupFields, IRequestError, IResponse, IUser } from "@/types";
-import axios from "axios";
+import { api } from "@/config/axios.config";
 
 type TMutationResponse = IResponse<IUser>;
 
 const signup: MutationFunction<IUser, ISignupFields> = async (data) => {
-   const response = await axios.post<TMutationResponse>(
+   const response = await api.post<TMutationResponse>(
       import.meta.env.VITE_API + "/api/auth/signup",
       data,
    );

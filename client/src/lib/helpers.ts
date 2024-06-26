@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 import { IUser, IMessage, IChatUser, IChat } from "@/types";
 
 export const checkImage = (file: File) => {

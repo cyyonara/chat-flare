@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Outlet, useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient, InfiniteData } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 import {
    IChat,
    IMessage,
@@ -174,6 +174,48 @@ export default function SocketProvider({}: IProps) {
          socket.removeListener("new-message");
       };
    }, [chatId]);
+
+   useEffect(() => {
+      socket.on("update-message-reaction", (updatedMessage: IMessage) => {
+         const isMessagesInCache = queryClient.getQueryData([
+            "messages",
+            updatedMessage.chatId,
+         ]);
+
+         const isInReceivers = updatedMessage.receivers.find(
+            (receiver) => receiver.user._id === currentUserId,
+         );
+
+         if (isMessagesInCache && isInReceivers) {
+            queryClient.setQueryData(
+               ["messages", updatedMessage.chatId],
+               (
+                  queryData: InfiniteData<IPaginatedFetchedMessages>,
+               ): InfiniteData<IPaginatedFetchedMessages> => ({
+                  ...queryData,
+                  pages: queryData.pages.map((page) => ({
+                     ...page,
+                     messages: page.messages.map((message) => {
+                        if (message._id === updatedMessage._id) {
+                           return {
+                              ...updatedMessage,
+                              statusId: uuid(),
+                              isSending: false,
+                           };
+                        } else {
+                           return message;
+                        }
+                     }),
+                  })),
+               }),
+            );
+         }
+      });
+
+      return () => {
+         socket.removeListener("update-message-reaction");
+      };
+   }, []);
 
    return <>{<Outlet />}</>;
 }

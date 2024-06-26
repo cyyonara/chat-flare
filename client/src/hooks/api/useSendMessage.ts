@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { INewMessage, IRequestError, IResponse, IChat } from "@/types";
 import { uploadImage } from "@/services/firebase";
-import axios from "axios";
+import { api } from "@/config/axios.config";
 
 type TMutationResponse = IResponse<IChat>;
 
@@ -16,14 +16,11 @@ const sendMessage: MutationFunction<IChat, INewMessage> = async ({
 }) => {
    let actualContent = isImage ? await uploadImage(content as File) : content;
 
-   const response = await axios.post<TMutationResponse>(
-      import.meta.env.VITE_API + `/api/messages/${chatId}`,
+   const response = await api.post<TMutationResponse>(
+      `/api/messages/${chatId}`,
       {
          content: actualContent,
          isImage,
-      },
-      {
-         withCredentials: true,
       },
    );
    return response.data.data;

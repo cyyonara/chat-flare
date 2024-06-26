@@ -3,7 +3,7 @@ import { IMessageReactor } from "@/types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 
 interface IProps {
    reactors: IMessageReactor[];

@@ -9,7 +9,7 @@ interface IProps extends IChat {}
 
 export default function Chat({ _id, users, lastMessage, updatedAt }: IProps) {
    const { chatId } = useParams();
-   const { username, profilePicture } = getChatMateInfo(users).user;
+   const { username, profilePicture } = getChatMateInfo(users)!.user;
 
    return (
       <Link to={`/chats/${_id}`}>

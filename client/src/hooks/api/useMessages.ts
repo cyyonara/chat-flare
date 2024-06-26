@@ -11,8 +11,8 @@ import {
    IRequestError,
 } from "@/types";
 import { v4 as uuid } from "uuid";
-import axios from "axios";
 import { useParams } from "react-router-dom";
+import { api } from "@/config/axios.config";
 
 type TQueryResponse = IResponse<IPaginatedMessages>;
 
@@ -23,12 +23,8 @@ const getMessages: QueryFunction<
 > = async ({ pageParam, queryKey }) => {
    const chatId = queryKey[1];
 
-   const response = await axios.get<TQueryResponse>(
-      import.meta.env.VITE_API +
-         `/api/messages/${chatId}?page=${pageParam}&limit=15`,
-      {
-         withCredentials: true,
-      },
+   const response = await api.get<TQueryResponse>(
+      `/api/messages/${chatId}?page=${pageParam}&limit=15`,
    );
 
    return {

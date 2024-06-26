@@ -1,9 +1,10 @@
 import { useUpdateReaction } from "@/hooks/api/useUpdateReaction";
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 import { cn } from "@/lib/utils";
 import { IPaginatedFetchedMessages, IUser } from "@/types";
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { socket } from "@/components/providers/SocketProvider";
 
 interface IProps {
    messageId: string;
@@ -93,10 +94,10 @@ export default function Reaction({
       }
       mutate([reaction, messageId], {
          onSuccess: (data) => {
-            console.log(data);
+            socket.emit("update-message-reaction", data);
          },
+         onSettled: closeReactionPicker,
       });
-      closeReactionPicker();
    };
 
    return (

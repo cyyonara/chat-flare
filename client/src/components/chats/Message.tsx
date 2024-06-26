@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/custom/useAuth";
+import { useAuth } from "@/hooks/states/useAuth";
 import { cn } from "@/lib/utils";
 import { IFetchedMessage, IPaginatedFetchedMessages } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,10 +11,10 @@ import {
 import { Loader2 } from "lucide-react";
 import { MdEmojiEmotions } from "react-icons/md";
 import { useMemo, useState } from "react";
-import ReactionPicker from "@/components/chats/ReactionPicker";
 import { AnimatePresence } from "framer-motion";
+import ReactionPicker from "@/components/chats/ReactionPicker";
 import MessageReactions from "@/components/chats/MessageReactions";
-import ReactorsList from "./ReactorsList";
+import ReactorsList from "@/components/chats/ReactorsList";
 
 interface IProps extends IFetchedMessage {
    pageIndex: number;
@@ -339,10 +339,9 @@ export default function Message({
                      ) : (
                         <div
                            className={cn(
-                              "bg-secondary rounded-lg py-2 px-3 text-sm text-primary font-semibold",
+                              "bg-secondary rounded-lg py-2 px-3 text-sm text-primary text-white",
                               {
-                                 "bg-primary text-secondary":
-                                    sender._id === currentUserId,
+                                 "bg-primary": sender._id === currentUserId,
                               },
                            )}
                         >

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, ReactNode } from "react";
 import {
    Card,
    CardHeader,
@@ -13,11 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useInView } from "react-intersection-observer";
-import { useDebounce } from "@/hooks/custom/useDebounce";
+import { useDebounce } from "@/hooks/states/useDebounce";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
 import { useCreateChat } from "@/hooks/api/useCreateChat";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/states/useAuth";
+import { useLogout } from "@/hooks/api/useLogout";
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { socket } from "@/components/providers/SocketProvider";
@@ -47,11 +49,15 @@ export default function CreateGroupModal({ closeModal }: IProps) {
       fetchNextPage,
       refetch,
    } = useSearchUsers(debounceValue);
+   const clearCredentials = useAuth((state) => state.clearCredentials);
+   const logoutMutation = useLogout();
    const { ref, inView } = useInView();
    const { toast } = useToast();
    const navigate = useNavigate();
    const queryClient = useQueryClient();
    const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+   let content: ReactNode;
 
    const handleSelectedUsers = useCallback((checked: boolean, user: IUser) => {
       if (checked) {
@@ -98,16 +104,56 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                   socket.emit("new-groupChat", data);
                },
                onError: (err) => {
-                  toast({
-                     title: "Oops!",
-                     description:
-                        err.response?.data.message || "Something went wrong",
-                  });
+                  if (err.response?.status === 401) {
+                     logoutMutation.mutate(null, {
+                        onSuccess: clearCredentials,
+                     });
+                  } else {
+                     toast({
+                        title: "Oops!",
+                        description:
+                           err.response?.data.message || "Something went wrong",
+                     });
+                  }
                },
             },
          );
       }
    };
+
+   if (isLoading || isFetching) {
+      content = <UserResultSkeleton count={1} />;
+   }
+
+   if (isError && !isFetching) {
+      content = <UserSearchError retry={() => refetch()} />;
+   }
+
+   if (isSuccess) {
+      content = (
+         <>
+            {!data.pages[0].users.length ? (
+               <p className="text-center">No users found</p>
+            ) : (
+               data.pages.map((page) =>
+                  page.users.map((user) => (
+                     <AddUserResult
+                        key={user._id}
+                        _id={user._id}
+                        username={user.username}
+                        email={user.email}
+                        profilePicture={user.profilePicture}
+                        selectedUsers={selectedUsers}
+                        handleSelectedUsers={handleSelectedUsers}
+                        isCreateChatLoading={isCreateChatLoading}
+                     />
+                  )),
+               )
+            )}
+            <div ref={ref}></div>
+         </>
+      );
+   }
 
    useEffect(() => {
       if (inView) {
@@ -171,36 +217,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                         ))}
                      </div>
                      <div className="custom-scroll flex max-h-[300px] flex-col gap-y-2 overflow-y-auto p-2 ">
-                        {isLoading && <UserResultSkeleton count={1} />}
-                        {isFetching && <UserResultSkeleton count={1} />}
-                        {isError && <UserSearchError retry={() => refetch()} />}
-                        {isSuccess && (
-                           <>
-                              {!data.pages[0].users.length ? (
-                                 <p className="text-center">No users found</p>
-                              ) : (
-                                 data.pages.map((page) =>
-                                    page.users.map((user) => (
-                                       <AddUserResult
-                                          key={user._id}
-                                          _id={user._id}
-                                          username={user.username}
-                                          email={user.email}
-                                          profilePicture={user.profilePicture}
-                                          selectedUsers={selectedUsers}
-                                          handleSelectedUsers={
-                                             handleSelectedUsers
-                                          }
-                                          isCreateChatLoading={
-                                             isCreateChatLoading
-                                          }
-                                       />
-                                    )),
-                                 )
-                              )}
-                              <div ref={ref}></div>
-                           </>
-                        )}
+                        {content}
                      </div>
                   </div>
                </CardContent>

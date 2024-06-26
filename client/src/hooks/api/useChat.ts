@@ -1,6 +1,6 @@
 import { useQuery, QueryFunction, UseQueryResult } from "@tanstack/react-query";
 import { IChat, IResponse, IRequestError } from "@/types";
-import axios from "axios";
+import { api } from "@/config/axios.config";
 
 type TQueryResponse = IResponse<IChat>;
 
@@ -8,10 +8,7 @@ const getChat: QueryFunction<IChat, [string, string]> = async ({
    queryKey,
 }) => {
    const chatId = queryKey[1];
-   const response = await axios.get<TQueryResponse>(
-      import.meta.env.VITE_API + `/api/chats/${chatId}`,
-      { withCredentials: true },
-   );
+   const response = await api.get<TQueryResponse>(`/api/chats/${chatId}`);
    return response.data.data;
 };
 

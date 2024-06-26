@@ -5,7 +5,7 @@ import {
    InfiniteData,
 } from "@tanstack/react-query";
 import { IPaginatedUsers, IResponse, IRequestError } from "@/types";
-import axios from "axios";
+import { api } from "@/config/axios.config";
 
 type TQueryResponse = IResponse<IPaginatedUsers>;
 
@@ -15,10 +15,8 @@ const getUsers: QueryFunction<
    number
 > = async ({ queryKey, pageParam }) => {
    const keyword = queryKey[1];
-   const response = await axios.get<TQueryResponse>(
-      import.meta.env.VITE_API +
-         `/api/user/search?keyword=${keyword}&page=${pageParam}&limit=5`,
-      { withCredentials: true },
+   const response = await api.get<TQueryResponse>(
+      `/api/user/search?keyword=${keyword}&page=${pageParam}&limit=5`,
    );
    return response.data.data;
 };

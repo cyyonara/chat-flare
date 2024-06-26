@@ -13,7 +13,7 @@ const cookieOptions: CookieOptions = {
    httpOnly: true,
    secure: process.env.NODE_ENV !== 'DEV',
    sameSite: process.env.NODE_ENV === 'DEV' ? 'lax' : 'none',
-   maxAge: 60_000 * 60 * 24 * 60,
+   maxAge: 60_000 * 60 * 24 * 60, // 60 days
 };
 
 // @POST - public - /api/auth/signup
@@ -188,3 +188,10 @@ export const googleSignup = expressAsyncHandler(async (req: Request, res: Respon
       throw new Error(errorMessage);
    }
 });
+
+// @DELETE - public - /api/auth/logout
+export const logout = (req: Request, res: Response) => {
+   res.clearCookie('cfAuth')
+      .status(200)
+      .json({ success: true, data: null, message: 'Logged out successfully.' });
+};
