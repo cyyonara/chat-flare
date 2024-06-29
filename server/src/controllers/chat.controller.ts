@@ -11,22 +11,56 @@ import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
 
 // @POST - private - /api/chats
 export const createChat = expressAsyncHandler(async (req: IRequest, res: Response) => {
-   try {
-      const { chatName, users, isGroupChat } = createChatSchema.parse(req.body);
-      const chat = new Chat({
-         chatPhoto: req.user?.profilePicture,
-         chatName,
-         chatCreator: req.user?._id,
-         isGroupChat,
-         users: [
-            { user: req.user?._id, hasLeft: false },
-            ...users.map((user) => ({ user, hasLeft: false })),
+   const { chatName, users, isGroupChat } = createChatSchema.parse(req.body);
+   const chat = new Chat({
+      chatPhoto: req.user?.profilePicture,
+      chatName,
+      chatCreator: req.user?._id,
+      isGroupChat,
+      users: [
+         { user: req.user?._id, hasLeft: false },
+         ...users.map((user) => ({ user, hasLeft: false })),
+      ],
+   });
+
+   if (isGroupChat) {
+      const newChat = await chat.save();
+      await newChat.populate({
+         path: 'chatCreator users.user',
+         select: '_id username email profilePicture',
+         model: User,
+      });
+
+      res.status(201).json({
+         success: true,
+         data: newChat,
+         message: 'Group chat created',
+      });
+   } else {
+      if (req.user?._id.toString() === users[0]) {
+         res.status(400);
+         throw new Error('Users cannot duplicate');
+      }
+
+      const singleChat = await Chat.findOne({
+         $and: [
+            { users: { $elemMatch: { user: req.user?._id } } },
+            { users: { $elemMatch: { user: users[0] } } },
+            { isGroupChat: false },
          ],
       });
 
-      if (isGroupChat) {
-         const newChat = await chat.save();
-         await newChat.populate({
+      if (singleChat) {
+         await singleChat.populate({
+            path: 'chatCreator users.user',
+            select: '_id username email profilePicture',
+            model: User,
+         });
+
+         res.status(201).json({ success: true, data: singleChat, message: 'Success' });
+      } else {
+         const newSingleChat = await chat.save();
+         await newSingleChat.populate({
             path: 'chatCreator users.user',
             select: '_id username email profilePicture',
             model: User,
@@ -34,57 +68,10 @@ export const createChat = expressAsyncHandler(async (req: IRequest, res: Respons
 
          res.status(201).json({
             success: true,
-            data: newChat,
-            message: 'Group chat created',
+            data: newSingleChat,
+            message: 'Chat created successfully',
          });
-      } else {
-         if (req.user?._id.toString() === users[0]) {
-            res.status(400);
-            throw new Error('Users cannot duplicate');
-         }
-
-         const singleChat = await Chat.findOne({
-            $and: [
-               { users: { $elemMatch: { user: req.user?._id } } },
-               { users: { $elemMatch: { user: users[0] } } },
-               { isGroupChat: false },
-            ],
-         });
-
-         if (singleChat) {
-            await singleChat.populate({
-               path: 'chatCreator users.user',
-               select: '_id username email profilePicture',
-               model: User,
-            });
-
-            res.status(201).json({ success: true, data: singleChat, message: 'Success' });
-         } else {
-            const newSingleChat = await chat.save();
-            await newSingleChat.populate({
-               path: 'chatCreator users.user',
-               select: '_id username email profilePicture',
-               model: User,
-            });
-
-            res.status(201).json({
-               success: true,
-               data: newSingleChat,
-               message: 'Chat created successfully',
-            });
-         }
       }
-   } catch (error: any) {
-      let errorMessage: string;
-
-      if (error instanceof ZodError) {
-         errorMessage = fromZodError(error).toString();
-         res.status(400);
-      } else {
-         errorMessage = (error as Error).message;
-      }
-
-      throw new Error(errorMessage);
    }
 });
 

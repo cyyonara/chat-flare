@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { IPaginatedFetchedMessages, IUser } from "@/types";
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { useLogout } from "@/hooks/api/useLogout";
 import { socket } from "@/components/providers/SocketProvider";
 
 interface IProps {
@@ -22,8 +23,9 @@ export default function Reaction({
    closeReactionPicker,
 }: IProps) {
    const { mutate } = useUpdateReaction();
-   const currentUser = useAuth((state) => state.user);
+   const { user: currentUser, clearCredentials } = useAuth((state) => state);
    const { chatId } = useParams();
+   const logoutMutation = useLogout();
    const queryClient = useQueryClient();
 
    const handleReact = () => {
@@ -95,6 +97,11 @@ export default function Reaction({
       mutate([reaction, messageId], {
          onSuccess: (data) => {
             socket.emit("update-message-reaction", data);
+         },
+         onError: (err) => {
+            if (err.response?.status === 401) {
+               logoutMutation.mutate(null, { onSuccess: clearCredentials });
+            }
          },
          onSettled: closeReactionPicker,
       });

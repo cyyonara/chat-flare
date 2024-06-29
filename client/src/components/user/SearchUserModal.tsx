@@ -13,6 +13,8 @@ import { useDebounce } from "@/hooks/states/useDebounce";
 import { useState, useEffect, useRef } from "react";
 import { useSearchUsers } from "@/hooks/api/useSearchUsers";
 import { useInView } from "react-intersection-observer";
+import { useAuth } from "@/hooks/states/useAuth";
+import { useLogout } from "@/hooks/api/useLogout";
 import InputIcon from "@/components/common/InputIcon";
 import UserResult from "@/components/user/UserResult";
 import Overlay from "@/components/common/Overlay";
@@ -28,6 +30,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
    const debounceValue = useDebounce(searchKeyword);
    const {
       data,
+      error,
       isLoading,
       isFetching,
       isSuccess,
@@ -36,11 +39,19 @@ export default function SearchUserModal({ closeModal }: IProps) {
       refetch,
    } = useSearchUsers(debounceValue);
    const [disableMessageButton, setDisableMessageButton] = useState(false);
+   const logoutMutation = useLogout();
+   const clearCredentials = useAuth((state) => state.clearCredentials);
    const { inView, ref } = useInView();
    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
    useEffect(() => {
       searchInputRef.current?.focus();
+   }, []);
+
+   useEffect(() => {
+      if (isError && error.response?.status === 401) {
+         logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      }
    }, []);
 
    useEffect(() => {

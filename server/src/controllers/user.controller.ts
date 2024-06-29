@@ -9,34 +9,21 @@ import expressAsyncHandler from 'express-async-handler';
 // @PATCH - private - /api/user/profile-picture
 export const updateProfilePicture = expressAsyncHandler(
    async (req: IRequest, res: Response): Promise<void> => {
-      try {
-         const { profilePicture }: { profilePicture: string } = req.body;
-         const validatedProfilePicture = z.string().url().parse(profilePicture);
-         const updatedUser = await User.findByIdAndUpdate(
-            req.user?._id,
-            {
-               $set: { profilePicture: validatedProfilePicture },
-            },
-            { new: true }
-         );
+      const { profilePicture }: { profilePicture: string } = req.body;
+      const validatedProfilePicture = z.string().url().parse(profilePicture);
+      const updatedUser = await User.findByIdAndUpdate(
+         req.user?._id,
+         {
+            $set: { profilePicture: validatedProfilePicture },
+         },
+         { new: true }
+      );
 
-         res.status(201).json({
-            success: true,
-            data: { newProfilePicture: updatedUser?.profilePicture },
-            message: 'Profile picture updated',
-         });
-      } catch (error: any) {
-         let errorMessage: string;
-
-         if (error instanceof ZodError) {
-            errorMessage = fromZodError(error).toString();
-            res.status(400);
-         } else {
-            errorMessage = (error as Error).message;
-         }
-
-         throw new Error(errorMessage);
-      }
+      res.status(201).json({
+         success: true,
+         data: { newProfilePicture: updatedUser?.profilePicture },
+         message: 'Profile picture updated',
+      });
    }
 );
 

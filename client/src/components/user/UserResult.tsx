@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useCreateChat } from "@/hooks/api/useCreateChat";
 import { useToast } from "@/components/ui/use-toast";
+import { useLogout } from "@/hooks/api/useLogout";
+import { useAuth } from "@/hooks/states/useAuth";
 
 interface IProps extends IUser {
    disableMessageButton: boolean;
@@ -30,6 +32,8 @@ export default function UserResult({
 }: IProps) {
    const { mutate, isPending } = useCreateChat();
    const { toast } = useToast();
+   const clearCredentials = useAuth((state) => state.clearCredentials);
+   const logoutMutation = useLogout();
    const navigate = useNavigate();
 
    const handleMessageUser = () => {
@@ -46,11 +50,15 @@ export default function UserResult({
                closeModal();
             },
             onError: (error) => {
-               toast({
-                  title: "Oops!",
-                  description:
-                     error.response?.data.message || "Something went wrong.",
-               });
+               if (error.response?.status === 401) {
+                  logoutMutation.mutate(null, { onSuccess: clearCredentials });
+               } else {
+                  toast({
+                     title: "Oops!",
+                     description:
+                        error.response?.data.message || "Something went wrong.",
+                  });
+               }
             },
             onSettled: () => setDisableMessageButton(false),
          },

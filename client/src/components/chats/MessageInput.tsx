@@ -19,6 +19,7 @@ import { useQueryClient, InfiniteData } from "@tanstack/react-query";
 import { IPaginatedChats, IPaginatedFetchedMessages, IUser } from "@/types";
 import { useAuth } from "@/hooks/states/useAuth";
 import { socket } from "@/components/providers/SocketProvider";
+import { useLogout } from "@/hooks/api/useLogout";
 
 interface IProps {
    isSuccess: boolean;
@@ -30,7 +31,8 @@ export default function MessageInput({ isSuccess }: IProps) {
    const { mutate } = useSendMessage();
    const { toast } = useToast();
    const { chatId } = useParams();
-   const currentUser = useAuth((state) => state.user);
+   const { user: currentUser, clearCredentials } = useAuth((state) => state);
+   const logoutMutation = useLogout();
    const imageInputRef = useRef<HTMLInputElement | null>(null);
    const queryClient = useQueryClient();
 
@@ -131,6 +133,11 @@ export default function MessageInput({ isSuccess }: IProps) {
                   exact: true,
                });
                socket.emit("new-message", data);
+            },
+            onError: (err) => {
+               if (err.response?.status === 401) {
+                  logoutMutation.mutate(null, { onSuccess: clearCredentials });
+               }
             },
          },
       );
