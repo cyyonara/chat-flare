@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { verify } from '../middlewares/verify';
-import { createChat, getChats, getChat } from '../controllers/chat.controller';
+import {
+  createChat,
+  getChats,
+  getChat,
+  changeGroupChatPhoto,
+} from '../controllers/chat.controller';
 
 const router = Router();
 
@@ -12,5 +17,8 @@ router.get('/', verify, getChats);
 
 // @GET - private - /api/chats/:chatId
 router.get('/:chatId', verify, getChat);
+
+// @PATCH - private - /api/chats/:chatId/chat-photo
+router.patch('/:chatId/chat-photo', verify, changeGroupChatPhoto);
 
 export default router;

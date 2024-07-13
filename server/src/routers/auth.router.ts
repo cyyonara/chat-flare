@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import {
-   signup,
-   login,
-   googleLogin,
-   googleSignup,
-   logout,
+  signup,
+  login,
+  googleLogin,
+  googleSignup,
+  logout,
 } from '../controllers/auth.controller';
 
 const router = Router();

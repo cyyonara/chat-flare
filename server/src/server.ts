@@ -22,11 +22,11 @@ const port = process.env.PORT || 4001;
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-   cors: {
-      origin: 'http://localhost:3000',
-      credentials: true,
-      allowedHeaders: '*',
-   },
+  cors: {
+    origin: 'http://localhost:3000',
+    credentials: true,
+    allowedHeaders: '*',
+  },
 });
 
 app.use(morgan('dev'));
@@ -44,19 +44,19 @@ app.use(notFound);
 app.use(errorHandler);
 
 server.listen(port, () => {
-   console.log(`server is running at port ${port}`);
+  console.log(`server is running at port ${port}`);
 });
 
 io.on('connection', (socket) => {
-   socket.on('new-groupChat', (newGroupChat) => {
-      socket.broadcast.emit('new-groupChat', newGroupChat);
-   });
+  socket.on('new-groupChat', (newGroupChat) => {
+    socket.broadcast.emit('new-groupChat', newGroupChat);
+  });
 
-   socket.on('new-message', (updatedChat) => {
-      socket.broadcast.emit('new-message', updatedChat);
-   });
+  socket.on('new-message', (updatedChat) => {
+    socket.broadcast.emit('new-message', updatedChat);
+  });
 
-   socket.on('update-message-reaction', (updatedMessage) => {
-      socket.broadcast.emit('update-message-reaction', updatedMessage);
-   });
+  socket.on('update-message-reaction', (updatedMessage) => {
+    socket.broadcast.emit('update-message-reaction', updatedMessage);
+  });
 });

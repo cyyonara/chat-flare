@@ -9,26 +9,26 @@ export interface ISignupData extends z.infer<typeof signupSchema> {}
 export interface ILoginData extends z.infer<typeof loginSchema> {}
 
 export interface IRequest extends Request {
-   user?: HydratedDocument<{
-      _id: Types.ObjectId;
-      username: string;
-      email: string;
-      profilePicture: string;
-      password: string;
-   }>;
+  user?: HydratedDocument<{
+    _id: Types.ObjectId;
+    username: string;
+    email: string;
+    profilePicture: string;
+    password: string;
+  }>;
 }
 
 export interface ITokenPayload extends JwtPayload {
-   _id: string;
+  _id: string;
 }
 
 export interface IPaginationData {
-   parsedPage: number;
-   parsedLimit: number;
+  parsedPage: number;
+  parsedLimit: number;
 }
 
 export interface IPaginationResponse {
-   totalPages: number;
-   hasNextPage: boolean;
-   nextPage: number | null;
+  totalPages: number;
+  hasNextPage: boolean;
+  nextPage: number | null;
 }
