@@ -2,7 +2,11 @@ import expressAsyncHandler from 'express-async-handler';
 import { Chat } from '../models/chat.model';
 import { Response } from 'express';
 import { IRequest } from '../utils/types';
-import { createChatSchema, newGroupChatPhotoSchema } from '../utils/validations';
+import {
+  createChatSchema,
+  newGroupChatPhotoSchema,
+  groupNameSchema,
+} from '../utils/validations';
 import { User } from '../models/user.model';
 import { Message } from '../models/message.model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
@@ -180,7 +184,7 @@ export const changeGroupChatPhoto = expressAsyncHandler(
     }
 
     chat.chatPhoto = newGroupChatPhoto;
-    const updatedChat = await chat.save();
+    const updatedChat = await chat.save({ timestamps: false });
 
     await updatedChat.populate({
       path: 'users.user',
@@ -203,5 +207,45 @@ export const changeGroupChatPhoto = expressAsyncHandler(
       data: updatedChat,
       message: 'Group photo successfully changed.',
     });
+  }
+);
+
+// @PATCH - private - /api/chats/:chatId/group-name
+export const changeGroupName = expressAsyncHandler(
+  async (req: IRequest, res: Response) => {
+    const { groupName } = groupNameSchema.parse(req.body);
+    const { chatId } = req.params;
+
+    const chat = await Chat.findOne({
+      _id: chatId,
+      isGroupChat: true,
+      users: { $elemMatch: { user: req.user?._id, hasLeft: false } },
+    });
+
+    if (!chat) {
+      res.status(404);
+      throw new Error('Chat not found.');
+    }
+
+    chat.chatName = groupName;
+
+    const updatedChat = await chat.save({ timestamps: false });
+
+    await updatedChat.populate({
+      path: 'chatCreator users.user',
+      select: '_id username email profilePicture',
+      model: User,
+    });
+
+    await updatedChat.populate({
+      path: 'lastMessage',
+      model: Message,
+      populate: {
+        path: 'sender receivers reactors.user',
+        select: '_id username email profilePicture',
+      },
+    });
+
+    res.status(201).json({ success: true, data: updatedChat, message: 'Ok' });
   }
 );

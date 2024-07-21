@@ -30,15 +30,15 @@ export default function UserResult({
   setDisableMessageButton,
   closeModal,
 }: IProps) {
-  const { mutate, isPending } = useCreateChat();
+  const { mutate: createChat, isPending } = useCreateChat();
   const { toast } = useToast();
   const clearCredentials = useAuth((state) => state.clearCredentials);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const navigate = useNavigate();
 
   const handleMessageUser = () => {
     setDisableMessageButton(true);
-    mutate(
+    createChat(
       {
         chatName: uuid(),
         isGroupChat: false,
@@ -51,7 +51,7 @@ export default function UserResult({
         },
         onError: (error) => {
           if (error.response?.status === 401) {
-            logoutMutation.mutate(null, { onSuccess: clearCredentials });
+            logout(null, { onSuccess: clearCredentials });
           } else {
             toast({
               title: 'Oops!',
@@ -71,7 +71,7 @@ export default function UserResult({
         <AvatarFallback className='uppercase'>{username.substring(0, 2)}</AvatarFallback>
       </Avatar>
       <div className='flex flex-1 flex-col'>
-        <p className='line-clamp-1 font-semibold'>{username}</p>
+        <div className='line-clamp-1 font-semibold'>{username}</div>
         <span className='line-clamp-1 text-xs'>{email}</span>
       </div>
       <TooltipProvider>

@@ -14,7 +14,7 @@ export default function MessagesContainer({ isFetchingChatSuccess }: IProps) {
   const { data, isLoading, isSuccess, isFetching, isError, error, fetchNextPage } =
     useMessages(isFetchingChatSuccess);
   const clearCredentials = useAuth((state) => state.clearCredentials);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const { ref, inView } = useInView();
 
   let messagesContainerContent: ReactNode;
@@ -49,7 +49,7 @@ export default function MessagesContainer({ isFetchingChatSuccess }: IProps) {
 
   useEffect(() => {
     if (isError && error.response?.status === 401) {
-      logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      logout(null, { onSuccess: clearCredentials });
     }
   }, [isError]);
 

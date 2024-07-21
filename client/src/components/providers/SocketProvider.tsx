@@ -14,7 +14,7 @@ export const socket = io(import.meta.env.VITE_API);
 interface IProps {}
 
 export default function SocketProvider({}: IProps) {
-  const currentUserId = useAuth((state) => state.user?._id) as string;
+  const currentUserId = useAuth((state) => state.user!._id);
   const { toast } = useToast();
   const { chatId } = useParams();
   const queryClient = useQueryClient();
@@ -47,8 +47,68 @@ export default function SocketProvider({}: IProps) {
       }
     });
 
+    socket.on('update-message-reaction', (updatedMessage: IMessage) => {
+      const isMessagesInCache = queryClient.getQueryData([
+        'messages',
+        updatedMessage.chatId,
+      ]);
+
+      if (isMessagesInCache) {
+        queryClient.setQueryData(
+          ['messages', updatedMessage.chatId],
+          (
+            queryData: InfiniteData<IPaginatedFetchedMessages>
+          ): InfiniteData<IPaginatedFetchedMessages> => ({
+            ...queryData,
+            pages: queryData.pages.map((page) => ({
+              ...page,
+              messages: page.messages.map((message) => {
+                if (message._id === updatedMessage._id) {
+                  return {
+                    ...updatedMessage,
+                    statusId: uuid(),
+                    isSending: false,
+                  };
+                } else {
+                  return message;
+                }
+              }),
+            })),
+          })
+        );
+      }
+    });
+
+    // Update group chat info - [chat name, group photo]
+    socket.on('update-chat', (updatedChat: IChat) => {
+      queryClient.setQueryData(
+        ['chats'],
+        (queryData: InfiniteData<IPaginatedChats>): InfiniteData<IPaginatedChats> => ({
+          ...queryData,
+          pages: queryData.pages.map((page) => ({
+            ...page,
+            chats: page.chats.map((chat) => {
+              if (chat._id === updatedChat._id) {
+                return updatedChat;
+              } else {
+                return chat;
+              }
+            }),
+          })),
+        })
+      );
+
+      const isChatInCache = queryClient.getQueryData(['chats', updatedChat._id]);
+
+      if (isChatInCache) {
+        queryClient.setQueryData(['chats', updatedChat._id], (): IChat => updatedChat);
+      }
+    });
+
     return () => {
       socket.removeListener('new-groupChat');
+      socket.removeListener('update-message-reaction');
+      socket.removeListener('update-chat');
     };
   }, []);
 
@@ -161,47 +221,5 @@ export default function SocketProvider({}: IProps) {
     };
   }, [chatId]);
 
-  useEffect(() => {
-    socket.on('update-message-reaction', (updatedMessage: IMessage) => {
-      const isMessagesInCache = queryClient.getQueryData([
-        'messages',
-        updatedMessage.chatId,
-      ]);
-
-      const isInReceivers = updatedMessage.receivers.find(
-        (receiver) => receiver.user._id === currentUserId
-      );
-
-      if (isMessagesInCache && isInReceivers) {
-        queryClient.setQueryData(
-          ['messages', updatedMessage.chatId],
-          (
-            queryData: InfiniteData<IPaginatedFetchedMessages>
-          ): InfiniteData<IPaginatedFetchedMessages> => ({
-            ...queryData,
-            pages: queryData.pages.map((page) => ({
-              ...page,
-              messages: page.messages.map((message) => {
-                if (message._id === updatedMessage._id) {
-                  return {
-                    ...updatedMessage,
-                    statusId: uuid(),
-                    isSending: false,
-                  };
-                } else {
-                  return message;
-                }
-              }),
-            })),
-          })
-        );
-      }
-    });
-
-    return () => {
-      socket.removeListener('update-message-reaction');
-    };
-  }, []);
-
-  return <>{<Outlet />}</>;
+  return <Outlet />;
 }

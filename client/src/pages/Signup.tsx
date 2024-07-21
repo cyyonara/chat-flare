@@ -20,7 +20,7 @@ import { motion } from 'framer-motion';
 interface IProps {}
 
 export default function Signup({}: IProps) {
-  const { mutate, isPending: isSignupLoading } = useSignup();
+  const { mutate: signup, isPending: isSignupLoading } = useSignup();
   const [passwordsState, setPasswordsState] = useState<IShowPasswordState>({
     isShowPassword: false,
     isShowConfirmPassword: false,
@@ -43,7 +43,7 @@ export default function Signup({}: IProps) {
   );
 
   const handleSignup: SubmitHandler<ISignupFields> = (formData) => {
-    mutate(formData, {
+    signup(formData, {
       onSuccess: (data): void => {
         navigate('/account/set-up', {
           state: data,

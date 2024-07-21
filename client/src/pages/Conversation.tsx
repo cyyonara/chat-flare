@@ -14,12 +14,12 @@ interface IProps {}
 export default function Conversation({}: IProps) {
   const { chatId } = useParams();
   const { data, error, isLoading, isSuccess, isError } = useChat(chatId as string);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const clearCredentials = useAuth((state) => state.clearCredentials);
 
   useEffect(() => {
     if (isError && error.response?.status === 401) {
-      logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      logout(null, { onSuccess: clearCredentials });
     }
   }, [isError]);
 

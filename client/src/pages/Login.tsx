@@ -22,7 +22,7 @@ interface IProps {}
 export default function Login({}: IProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [googleLoginLoading, setGoogleLoginLoading] = useState<boolean>(false);
-  const { isPending: isLoginLoading, mutate } = useLogin();
+  const { mutate: login, isPending: isLoginLoading } = useLogin();
   const setCredentials = useAuth((state) => state.setCredentials);
   const {
     register,
@@ -34,8 +34,8 @@ export default function Login({}: IProps) {
   });
   const { toast } = useToast();
 
-  const login: SubmitHandler<ILoginFields> = (formData) => {
-    mutate(formData, {
+  const handleLogin: SubmitHandler<ILoginFields> = (formData) => {
+    login(formData, {
       onSuccess: (data) => setCredentials(data),
       onError: (error) => {
         toast({
@@ -72,7 +72,7 @@ export default function Login({}: IProps) {
           </span>
         </h2>
         <div className='flex w-full flex-col gap-y-4'>
-          <form className='flex flex-col gap-y-5' onSubmit={handleSubmit(login)}>
+          <form className='flex flex-col gap-y-5' onSubmit={handleSubmit(handleLogin)}>
             <div className='flex flex-col gap-y-2'>
               <Label htmlFor='email'>Email</Label>
               <Input

@@ -30,7 +30,7 @@ export default memo(function AddUserResult({
         <AvatarFallback className='uppercase'>{username.substring(0, 2)}</AvatarFallback>
       </Avatar>
       <div className='flex flex-1 flex-col'>
-        <p className='line-clamp-1 font-semibold'>{username}</p>
+        <div className='line-clamp-1 font-semibold'>{username}</div>
         <span className='line-clamp-1 text-xs'>{email}</span>
       </div>
       <Checkbox

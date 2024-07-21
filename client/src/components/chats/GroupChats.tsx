@@ -21,7 +21,7 @@ export default function GroupChats({}: IProps) {
     fetchNextPage,
   } = useChats();
   const clearCredentials = useAuth((state) => state.clearCredentials);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const { ref, inView } = useInView();
 
   let groupChatsContent: ReactNode;
@@ -53,7 +53,7 @@ export default function GroupChats({}: IProps) {
 
   useEffect(() => {
     if (isError && error.response?.status === 401) {
-      logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      logout(null, { onSuccess: clearCredentials });
     }
   }, [isError]);
 

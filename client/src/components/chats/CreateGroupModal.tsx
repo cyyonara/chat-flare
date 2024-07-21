@@ -38,12 +38,12 @@ export default function CreateGroupModal({ closeModal }: IProps) {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [groupName, setGroupName] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
-  const { mutate, isPending: isCreateChatLoading } = useCreateChat();
+  const { mutate: createChat, isPending: isCreateChatLoading } = useCreateChat();
   const debounceValue = useDebounce(searchKeyword);
   const { data, isLoading, isSuccess, isError, isFetching, fetchNextPage, refetch } =
     useSearchUsers(debounceValue);
   const clearCredentials = useAuth((state) => state.clearCredentials);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const { ref, inView } = useInView();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
 
   const handleCreateGroupChat = () => {
     if (groupName && selectedUsers.length) {
-      mutate(
+      createChat(
         { chatName: groupName, isGroupChat: true, users: selectedUsers },
         {
           onSuccess: (data) => {
@@ -96,15 +96,15 @@ export default function CreateGroupModal({ closeModal }: IProps) {
             navigate(`/chats/${data._id}`);
             socket.emit('new-groupChat', data);
           },
-          onError: (err) => {
-            if (err.response?.status === 401) {
-              logoutMutation.mutate(null, {
+          onError: (error) => {
+            if (error.response?.status === 401) {
+              logout(null, {
                 onSuccess: clearCredentials,
               });
             } else {
               toast({
                 title: 'Oops!',
-                description: err.response?.data.message || 'Something went wrong',
+                description: error.response?.data.message || 'Something went wrong',
               });
             }
           },

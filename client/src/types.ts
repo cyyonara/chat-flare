@@ -19,6 +19,7 @@ export interface IUser {
   username: string;
   email: string;
   profilePicture: string;
+  createdAt?: string;
 }
 
 export interface IPaginatedUsers {
@@ -129,6 +130,16 @@ export interface IGoogleCredentials {
 export interface IShowPasswordState {
   isShowPassword: boolean;
   isShowConfirmPassword: boolean;
+}
+
+export interface IChangeGroupPhotoData {
+  imageFile: File;
+  chatId: string;
+}
+
+export interface INewGroupName {
+  groupName: string;
+  chatId: string;
 }
 
 // store types

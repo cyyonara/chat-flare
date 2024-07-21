@@ -14,13 +14,13 @@ export default memo(function GoogleSignupButton({
   isSignupLoading,
   setGoogleSignupState,
 }: IProps) {
-  const { mutate, isPending: isLoading } = useGoogleSignup();
+  const { mutate: googleSignup, isPending: isLoading } = useGoogleSignup();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleGoogleSignup = () => {
     setGoogleSignupState(true);
-    mutate(null, {
+    googleSignup(null, {
       onSuccess: (data) => {
         navigate('/account/set-up', {
           replace: true,

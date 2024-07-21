@@ -14,18 +14,18 @@ export default memo(function GoogleLoginButton({
   isLoginLoading,
   setGoogleLoginState,
 }: IProps) {
-  const { mutate, isPending: isGoogleLoginLoading } = useGoogleLogin();
+  const { mutate: googleLogin, isPending: isGoogleLoginLoading } = useGoogleLogin();
   const { setCredentials } = useAuth((state) => state);
   const { toast } = useToast();
 
   const handleGoogleLogin = (): void => {
     setGoogleLoginState(true);
-    mutate(null, {
+    googleLogin(null, {
       onSuccess: (data) => setCredentials(data),
-      onError: (err) => {
+      onError: (error) => {
         toast({
           title: 'Oops!',
-          description: err.response?.data.message || 'Something went wrong',
+          description: error.response?.data.message || 'Something went wrong',
         });
       },
       onSettled: () => setGoogleLoginState(false),

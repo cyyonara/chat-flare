@@ -39,7 +39,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
     refetch,
   } = useSearchUsers(debounceValue);
   const [disableMessageButton, setDisableMessageButton] = useState(false);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const clearCredentials = useAuth((state) => state.clearCredentials);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const { inView, ref } = useInView();
@@ -86,7 +86,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
 
   useEffect(() => {
     if (isError && error.response?.status === 401) {
-      logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      logout(null, { onSuccess: clearCredentials });
     }
   }, [isError]);
 

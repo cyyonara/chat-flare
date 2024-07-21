@@ -3,9 +3,9 @@ import { IRequest } from '../utils/types';
 import { Response } from 'express';
 import { addMessageSchema, messageReactionSchema } from '../utils/validations';
 import { Chat } from '../models/chat.model';
-import expressAsyncHandler from 'express-async-handler';
 import { User } from '../models/user.model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
+import expressAsyncHandler from 'express-async-handler';
 
 // @POST - private - /api/messages/:chatId
 export const addMessage = expressAsyncHandler(async (req: IRequest, res: Response) => {
@@ -178,7 +178,7 @@ export const updateMessageReactions = expressAsyncHandler(
       });
     } else {
       res.status(404);
-      throw new Error('Message is not existing');
+      throw new Error('Message is not existing.');
     }
   }
 );

@@ -21,7 +21,7 @@ export default function Chats({}: IProps) {
     refetch,
     fetchNextPage,
   } = useChats();
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const clearCredentials = useAuth((state) => state.clearCredentials);
   const { ref, inView } = useInView();
 
@@ -58,7 +58,7 @@ export default function Chats({}: IProps) {
 
   useEffect(() => {
     if (isError && error.response?.status === 401) {
-      logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      logout(null, { onSuccess: clearCredentials });
     }
   }, [isError]);
 

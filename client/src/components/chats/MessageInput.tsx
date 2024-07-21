@@ -6,7 +6,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
-import { useState, useEffect, useRef, FormEvent } from 'react';
+import { useState, useEffect, useRef, FormEvent, ChangeEvent } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useParams } from 'react-router-dom';
 import { MdEmojiEmotions } from 'react-icons/md';
@@ -28,11 +28,11 @@ interface IProps {
 export default function MessageInput({ isSuccess }: IProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-  const { mutate } = useSendMessage();
+  const { mutate: sendMessage } = useSendMessage();
   const { toast } = useToast();
   const { chatId } = useParams();
   const { user: currentUser, clearCredentials } = useAuth((state) => state);
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const queryClient = useQueryClient();
 
@@ -78,7 +78,7 @@ export default function MessageInput({ isSuccess }: IProps) {
         }),
       })
     );
-    mutate(
+    sendMessage(
       { chatId: chatId as string, content: message, isImage },
       {
         onSuccess: (data) => {
@@ -127,9 +127,9 @@ export default function MessageInput({ isSuccess }: IProps) {
           });
           socket.emit('new-message', data);
         },
-        onError: (err) => {
-          if (err.response?.status === 401) {
-            logoutMutation.mutate(null, { onSuccess: clearCredentials });
+        onError: (error) => {
+          if (error.response?.status === 401) {
+            logout(null, { onSuccess: clearCredentials });
           }
         },
       }
@@ -149,7 +149,7 @@ export default function MessageInput({ isSuccess }: IProps) {
     }
   };
 
-  const handleSendImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSendImage = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const imageFile = e.target.files[0];
 

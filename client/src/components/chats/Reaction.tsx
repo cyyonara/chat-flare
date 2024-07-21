@@ -22,10 +22,10 @@ export default function Reaction({
   currentUserReaction,
   closeReactionPicker,
 }: IProps) {
-  const { mutate } = useUpdateReaction();
+  const { mutate: updateReaction } = useUpdateReaction();
   const { user: currentUser, clearCredentials } = useAuth((state) => state);
   const { chatId } = useParams();
-  const logoutMutation = useLogout();
+  const { mutate: logout } = useLogout();
   const queryClient = useQueryClient();
 
   const handleReact = () => {
@@ -94,13 +94,13 @@ export default function Reaction({
         })
       );
     }
-    mutate([reaction, messageId], {
+    updateReaction([reaction, messageId], {
       onSuccess: (data) => {
         socket.emit('update-message-reaction', data);
       },
-      onError: (err) => {
-        if (err.response?.status === 401) {
-          logoutMutation.mutate(null, { onSuccess: clearCredentials });
+      onError: (error) => {
+        if (error.response?.status === 401) {
+          logout(null, { onSuccess: clearCredentials });
         }
       },
       onSettled: closeReactionPicker,

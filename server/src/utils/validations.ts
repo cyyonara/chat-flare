@@ -117,3 +117,9 @@ export const newGroupChatPhotoSchema = z
       .url({ message: 'Invalid link.' }),
   })
   .strict();
+
+export const groupNameSchema = z
+  .object({
+    groupName: z.string().min(1, { message: 'Please input new group name.' }),
+  })
+  .strict();

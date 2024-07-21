@@ -27,6 +27,7 @@ export default function MessageReactions({
       }
     });
   };
+
   filterReactions();
 
   return (

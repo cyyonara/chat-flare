@@ -31,8 +31,13 @@ export const getLastMessageInfo = (lastMessage: IMessage): string => {
   return `${getUserInfo(lastMessage.sender) + messageInfo}`;
 };
 
-export const getChatMateInfo = (chatUser: IChatUser[]): IChatUser | null => {
-  return chatUser ? chatUser[1] : null;
+export const getChatMateInfo = (
+  chatUsers: IChatUser[],
+  currentUserId: string
+): IChatUser | undefined => {
+  return chatUsers
+    ? chatUsers.find((user) => user.user._id !== currentUserId)
+    : undefined;
 };
 
 export const isInChat = (chat: IChat, currentUserId: string): boolean => {

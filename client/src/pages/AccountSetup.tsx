@@ -17,7 +17,7 @@ const AccountSetup: React.FC<IProps> = () => {
   const userCredentials: IUser = location.state;
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>('');
-  const { isPending: isSetupLoading, mutate } = useSetup();
+  const { mutate: setAccount, isPending: isSetupLoading } = useSetup();
   const setCredentials = useAuth((state) => state.setCredentials);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const { toast } = useToast();
@@ -46,7 +46,7 @@ const AccountSetup: React.FC<IProps> = () => {
 
   const setupAccount = () => {
     if (imageFile) {
-      mutate(imageFile, {
+      setAccount(imageFile, {
         onSuccess: (data) => {
           setCredentials({
             ...userCredentials,

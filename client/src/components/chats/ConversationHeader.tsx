@@ -5,6 +5,7 @@ import { getChatMateInfo } from '@/lib/helpers';
 import { IoArrowBackSharp } from 'react-icons/io5';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/states/useAuth';
 
 interface IProps {
   chat: IChat | undefined;
@@ -13,7 +14,8 @@ interface IProps {
 }
 
 export default function ConversationHeader({ chat, isLoading, isSuccess }: IProps) {
-  const userInfo = getChatMateInfo(chat?.users as IChatUser[]);
+  const currentUserId = useAuth((state) => state.user!._id);
+  const userInfo = getChatMateInfo(chat?.users as IChatUser[], currentUserId);
   let headerContent: ReactNode;
 
   if (isLoading) {
@@ -37,6 +39,7 @@ export default function ConversationHeader({ chat, isLoading, isSuccess }: IProp
         <Avatar>
           <AvatarImage
             src={chat?.isGroupChat ? chat.chatPhoto : userInfo!.user.profilePicture}
+            className='object-cover object-center'
           />
           <AvatarFallback className='uppercase'>
             {chat?.isGroupChat
@@ -45,11 +48,13 @@ export default function ConversationHeader({ chat, isLoading, isSuccess }: IProp
           </AvatarFallback>
         </Avatar>
         <div className='flex flex-col justify-center'>
-          <p className='font-semibold'>
+          <div className='font-semibold'>
             {chat?.isGroupChat ? chat.chatName : userInfo!.user.username}
-          </p>
+          </div>
           {chat?.isGroupChat && (
-            <p className='text-xs text-muted-foreground'>{chat.users.length} people</p>
+            <div className='text-xs text-muted-foreground'>
+              {chat.users.length} members
+            </div>
           )}
         </div>
       </div>

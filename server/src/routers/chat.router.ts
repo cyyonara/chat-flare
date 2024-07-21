@@ -5,6 +5,7 @@ import {
   getChats,
   getChat,
   changeGroupChatPhoto,
+  changeGroupName,
 } from '../controllers/chat.controller';
 
 const router = Router();
@@ -20,5 +21,8 @@ router.get('/:chatId', verify, getChat);
 
 // @PATCH - private - /api/chats/:chatId/chat-photo
 router.patch('/:chatId/chat-photo', verify, changeGroupChatPhoto);
+
+// @PATCH - private - /api/chats/:chatId/group-name
+router.patch('/:chatId/group-name', verify, changeGroupName);
 
 export default router;

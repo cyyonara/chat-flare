@@ -25,19 +25,19 @@ export default function GroupChat({
         })}
       >
         <Avatar>
-          <AvatarImage src={chatPhoto} />
+          <AvatarImage src={chatPhoto} className='object-cover object-center' />
           <AvatarFallback className='uppercase'>
             {chatName.substring(0, 2)}
           </AvatarFallback>
         </Avatar>
         <div className='flex flex-1 flex-col'>
-          <p className='font-semibold'>{chatName}</p>
+          <div className='font-semibold'>{chatName}</div>
           <div className='flex items-end gap-x-2'>
-            <p className='line-clamp-1 text-sm'>
+            <div className='line-clamp-1 text-sm'>
               {lastMessage
                 ? getLastMessageInfo(lastMessage)
                 : getUserInfo(chatCreator) + ' started a group chat.'}
-            </p>
+            </div>
             <span className='ml-auto whitespace-nowrap text-xs leading-5 text-gray-500'>
               {formatDistanceStrict(new Date(updatedAt), new Date())} ago
             </span>
