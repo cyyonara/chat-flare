@@ -1,4 +1,4 @@
-import { IChatUser } from '@/types';
+import { IChat, IChatUser } from '@/types';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -16,18 +16,28 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { AnimatePresence } from 'framer-motion';
+import { IoPersonRemoveOutline } from 'react-icons/io5';
 import { v4 as uuid } from 'uuid';
 import MemberInfoModal from '@/components/chats/MemberInfoModal';
+import { useRemoveMember } from '@/hooks/api/useRemoveMember';
+import { useParams } from 'react-router-dom';
+import { socket } from '@/components/providers/SocketProvider';
+import { useQueryClient } from '@tanstack/react-query';
 
-interface IProps extends IChatUser {}
+interface IProps extends IChatUser {
+  isAdmin: boolean;
+}
 
-export default function Member({ user }: IProps) {
+export default function Member({ user, isAdmin }: IProps) {
   const { user: currentUser, clearCredentials } = useAuth((state) => state);
   const { mutate: createChat } = useCreateChat();
+  const { mutate: removeMember } = useRemoveMember();
   const { mutate: logout } = useLogout();
   const [showMemberInfoModal, setShowMemberInfoModal] = useState<boolean>(false);
   const { toast } = useToast();
   const { _id, email, username, profilePicture, createdAt } = user;
+  const { chatId } = useParams();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const handleMessageUser = () => {
@@ -53,6 +63,28 @@ export default function Member({ user }: IProps) {
     );
   };
 
+  const handleRemoveMember = () => {
+    removeMember(
+      { chatId: chatId as string, userId: user._id },
+      {
+        onSuccess: (data) => {
+          queryClient.setQueryData(['chats', chatId], (): IChat => data);
+          socket.emit('update-chat', data);
+        },
+        onError: (error) => {
+          if (error.response?.status === 401) {
+            logout(null, { onSuccess: clearCredentials });
+          } else {
+            toast({
+              title: 'Oops!',
+              description: error.response?.data.message || 'Something went wrong.',
+            });
+          }
+        },
+      }
+    );
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -64,12 +96,13 @@ export default function Member({ user }: IProps) {
             profilePicture={profilePicture}
             createdAt={createdAt}
             currentUserId={currentUser!._id}
+            isAdmin={isAdmin}
             handleMessageUser={handleMessageUser}
             closeMemberInfoModal={() => setShowMemberInfoModal(false)}
           />
         )}
       </AnimatePresence>
-      <div className='flex py-2 px-1 gap-x-3 items-center'>
+      <div className='flex py-2 px-1 gap-x-2 items-center'>
         <Avatar>
           <AvatarImage src={profilePicture} />
           <AvatarFallback className='uppercase'>
@@ -103,6 +136,15 @@ export default function Member({ user }: IProps) {
               >
                 <MessageCircleMoreIcon size={15} />
                 <span>Message</span>
+              </DropdownMenuItem>
+            )}
+            {isAdmin && user._id !== currentUser!._id && (
+              <DropdownMenuItem
+                className='cursor-pointer flex items-center gap-x-1'
+                onClick={handleRemoveMember}
+              >
+                <IoPersonRemoveOutline />
+                <span>Remove</span>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

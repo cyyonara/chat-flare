@@ -53,7 +53,9 @@ export default function ConversationHeader({ chat, isLoading, isSuccess }: IProp
           </div>
           {chat?.isGroupChat && (
             <div className='text-xs text-muted-foreground'>
-              {chat.users.length} members
+              {chat.users.length > 1
+                ? `${chat.users.length} members`
+                : `${chat.users.length} member`}
             </div>
           )}
         </div>

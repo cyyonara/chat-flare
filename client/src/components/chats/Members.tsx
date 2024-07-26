@@ -1,23 +1,22 @@
 import { IChatUser } from '@/types';
-import { useMemo } from 'react';
 import Member from '@/components/chats/Member';
+import { useAuth } from '@/hooks/states/useAuth';
 
 interface IProps {
   members: IChatUser[];
+  groupAdminId: string;
 }
 
-export default function Members({ members }: IProps) {
-  const sortedMembers = useMemo(
-    () =>
-      members.sort((a, b) => {
-        if (a.user.username.toLowerCase() < b.user.username.toLowerCase()) {
-          return -1;
-        } else {
-          return +1;
-        }
-      }),
-    []
-  );
+export default function Members({ members, groupAdminId }: IProps) {
+  const currentUserId = useAuth((state) => state.user!._id);
+
+  const sortedMembers = members.sort((a, b) => {
+    if (a.user.username.toLowerCase() < b.user.username.toLowerCase()) {
+      return -1;
+    } else {
+      return +1;
+    }
+  });
 
   return (
     <div className='flex flex-col gap-y-2'>
@@ -29,6 +28,7 @@ export default function Members({ members }: IProps) {
             _id={member._id}
             user={member.user}
             hasLeft={member.hasLeft}
+            isAdmin={groupAdminId === currentUserId}
           />
         ))}
       </div>

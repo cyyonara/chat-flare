@@ -1,4 +1,4 @@
-import { User } from '../models/user.model';
+import { User } from '../models/user-model';
 import { Response } from 'express';
 import { IRequest } from '../utils/types';
 import { ZodError, z } from 'zod';

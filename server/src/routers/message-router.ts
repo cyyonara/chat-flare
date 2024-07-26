@@ -5,7 +5,7 @@ import {
   getChatMessages,
   getChatPhotos,
   updateMessageReactions,
-} from '../controllers/message.controller';
+} from '../controllers/message-controller';
 
 const router = Router();
 

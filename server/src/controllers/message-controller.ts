@@ -1,9 +1,9 @@
-import { Message } from '../models/message.model';
+import { Message } from '../models/message-model';
 import { IRequest } from '../utils/types';
 import { Response } from 'express';
 import { addMessageSchema, messageReactionSchema } from '../utils/validations';
-import { Chat } from '../models/chat.model';
-import { User } from '../models/user.model';
+import { Chat } from '../models/chat-model';
+import { User } from '../models/user-model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
 import expressAsyncHandler from 'express-async-handler';
 

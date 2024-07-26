@@ -1,4 +1,4 @@
-import { IChat, IChatUser, IPaginatedChats } from '@/types';
+import { IChat, IChatUser, IPaginatedChats, IUser } from '@/types';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ChangeEvent, ReactNode, useRef, useState } from 'react';
 import { checkImage, getChatMateInfo } from '@/lib/helpers';
@@ -23,6 +23,7 @@ import { socket } from '@/components/providers/SocketProvider';
 import { IoMdPersonAdd } from 'react-icons/io';
 import EditGroupNameModal from '@/components/chats/EditGroupNameModal';
 import Members from '@/components/chats/Members';
+import AddMemberModal from '@/components/chats/AddMemberModal';
 
 interface IProps {
   isChatLoading: boolean;
@@ -38,6 +39,7 @@ export default function ChatInfo({
   chat,
 }: IProps) {
   const [showEditGroupNameModal, setShowEditGroupNameModal] = useState<boolean>(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState<boolean>(false);
   const { mutate: changeGroupChatPhoto, isPending } = useChangeGroupChatPhoto();
   const { mutate: logout } = useLogout();
   const { chatId } = useParams();
@@ -107,10 +109,11 @@ export default function ChatInfo({
   }
 
   if (isChatSuccess) {
-    const { user } = getChatMateInfo(
-      chat?.users as IChatUser[],
-      currentUser!._id
-    ) as IChatUser;
+    let user;
+
+    if (!chat!.isGroupChat) {
+      user = getChatMateInfo(chat?.users as IChatUser[], currentUser!._id)!.user as IUser;
+    }
 
     chatInfoContent = (
       <>
@@ -121,19 +124,24 @@ export default function ChatInfo({
               closeEditGroupNameModal={() => setShowEditGroupNameModal(false)}
             />
           )}
+          {showAddMemberModal && (
+            <AddMemberModal closeAddMemberModal={() => setShowAddMemberModal(false)} />
+          )}
         </AnimatePresence>
         <div className='flex-1 overflow-y-auto max-h-[100vh-81px] custom-scroll flex flex-col p-5 gap-y-8'>
           <div className='flex flex-col items-center gap-y-5 mt-6'>
             <div className='relative group'>
               <Avatar className='size-[100px]'>
                 <AvatarImage
-                  src={chat?.isGroupChat ? chat.chatPhoto : user.profilePicture}
+                  src={
+                    chat?.isGroupChat ? chat.chatPhoto : (user as IUser).profilePicture
+                  }
                   className='object-cover object-center'
                 />
                 <AvatarFallback className='uppercase text-2xl'>
                   {chat?.isGroupChat
                     ? chat.chatName.substring(0, 2)
-                    : user.username.substring(0, 2)}
+                    : (user as IUser).username.substring(0, 2)}
                 </AvatarFallback>
               </Avatar>
               {chat?.isGroupChat && (
@@ -176,19 +184,23 @@ export default function ChatInfo({
                   </div>
                 )}
                 <p className='font-semibold leading-none text-lg'>
-                  {chat!.isGroupChat ? chat!.chatName : user.username}
+                  {chat!.isGroupChat ? chat!.chatName : (user as IUser).username}
                 </p>
               </div>
               {!chat?.isGroupChat && (
                 <div className='flex items-end gap-x-1 text-muted-foreground'>
                   <MdEmail />
-                  <p className='text-xs'>{user.email}</p>
+                  <p className='text-xs'>{(user as IUser).email}</p>
                 </div>
               )}
             </div>
             {chat?.isGroupChat && (
               <div className='flex gap-y-1 flex-col items-center'>
-                <Button variant='secondary' className='size-[40px] rounded-full p-0'>
+                <Button
+                  variant='secondary'
+                  className='size-[40px] rounded-full p-0'
+                  onClick={() => setShowAddMemberModal(true)}
+                >
                   <IoMdPersonAdd size={18} />
                 </Button>
                 <div className='text-muted-foreground text-sm'>Add</div>
@@ -196,7 +208,9 @@ export default function ChatInfo({
             )}
           </div>
           <div className='flex flex-col gap-y-4'>
-            {chat?.isGroupChat && <Members members={chat!.users} />}
+            {chat?.isGroupChat && (
+              <Members members={chat!.users} groupAdminId={chat.chatCreator._id} />
+            )}
           </div>
         </div>
       </>

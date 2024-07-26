@@ -4,7 +4,7 @@ import { ISignupData } from '../utils/types';
 import { googleSignupSchema, loginSchema, signupSchema } from '../utils/validations';
 import { fromZodError } from 'zod-validation-error';
 import { ZodError } from 'zod';
-import { User } from '../models/user.model';
+import { User } from '../models/user-model';
 import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcrypt';
 

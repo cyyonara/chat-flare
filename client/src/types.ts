@@ -142,6 +142,11 @@ export interface INewGroupName {
   chatId: string;
 }
 
+export interface IRemoveMemberData {
+  chatId: string;
+  userId: string;
+}
+
 // store types
 export interface IAuthState {
   user: IUser | null;

@@ -203,7 +203,7 @@ export default function CreateGroupModal({ closeModal }: IProps) {
                     email={user.email}
                     profilePicture={user.profilePicture}
                     handleSelectedUsers={handleSelectedUsers}
-                    isCreateChatLoading={isCreateChatLoading}
+                    isLoading={isCreateChatLoading}
                   />
                 ))}
               </div>

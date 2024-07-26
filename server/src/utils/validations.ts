@@ -123,3 +123,11 @@ export const groupNameSchema = z
     groupName: z.string().min(1, { message: 'Please input new group name.' }),
   })
   .strict();
+
+export const addGroupMemberSchema = z
+  .object({
+    usersId: z
+      .array(z.string().min(1, { message: 'Invalid user id.' }))
+      .min(1, { message: 'You need atleast 1 member to proceed.' }),
+  })
+  .strict();

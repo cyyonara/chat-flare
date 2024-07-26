@@ -4,13 +4,13 @@ import http from 'http';
 import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRouter from './routers/auth.router';
-import userRouter from './routers/user.router';
-import chatRouter from './routers/chat.router';
+import authRouter from './routers/auth-router';
+import userRouter from './routers/user-router';
+import chatRouter from './routers/chat-router';
 import { dbConnect } from './config/db.connect';
 import { notFound, errorHandler } from './middlewares/error.handler';
 import { Server } from 'socket.io';
-import messageRouter from './routers/message.router';
+import messageRouter from './routers/message-router';
 
 dotenv.config();
 

@@ -1,5 +1,5 @@
 import expressAsyncHandler from 'express-async-handler';
-import { Chat } from '../models/chat.model';
+import { Chat } from '../models/chat-model';
 import { Response } from 'express';
 import { IRequest } from '../utils/types';
 import {
@@ -7,8 +7,8 @@ import {
   newGroupChatPhotoSchema,
   groupNameSchema,
 } from '../utils/validations';
-import { User } from '../models/user.model';
-import { Message } from '../models/message.model';
+import { User } from '../models/user-model';
+import { Message } from '../models/message-model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
 
 // @POST - private - /api/chats
@@ -248,4 +248,107 @@ export const changeGroupName = expressAsyncHandler(
 
     res.status(201).json({ success: true, data: updatedChat, message: 'Ok' });
   }
+);
+
+// @DELETE - private - /api/chats/:chatId/members/:userId
+export const removeMember = expressAsyncHandler(async (req: IRequest, res: Response) => {
+  const { chatId, userId } = req.params;
+
+  const chat = await Chat.findOne({ _id: chatId, isGroupChat: true });
+
+  if (!chat) {
+    res.status(404);
+    throw new Error('Chat not found.');
+  }
+
+  if (chat?.chatCreator.toString() !== req.user?._id.toString()) {
+    res.status(401);
+    throw new Error('Only admin can remove other members.');
+  }
+
+  chat.users = chat.users.filter(
+    (user) => user.user.toString() !== userId
+  ) as typeof chat.users;
+
+  await chat.save({ timestamps: false });
+  await chat.populate({
+    path: 'chatCreator users.user',
+    select: '_id username email profilePicture',
+    model: User,
+  });
+  await chat.populate({
+    path: 'lastMessage',
+    model: Message,
+    populate: {
+      path: 'sender receivers.user reactors.user',
+      select: '_id username email profilePicture',
+      model: User,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    data: chat,
+    message: 'Member successfully removed from the group.',
+  });
+});
+
+// @GET - private - /api/chats/:chatId/members/search?keyword=?&page=?&limit=?
+export const searchNonExistingGroupMember = expressAsyncHandler(
+  async (req: IRequest, res: Response) => {
+    const { chatId } = req.params;
+    const { keyword, page, limit } = req.query;
+
+    const chat = await Chat.findById(chatId);
+
+    const { parsedPage, parsedLimit } = parsePaginationData(
+      page as string,
+      limit as string
+    );
+
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const searchFilter = {
+      $and: [
+        {
+          $or: [
+            { username: { $regex: keyword, $options: 'i' } },
+            { email: { $regex: keyword, $options: 'i' } },
+          ],
+        },
+        { $and: chat?.users.map((user) => ({ _id: { $ne: user.user } })) },
+      ],
+    };
+
+    const users = await User.find(searchFilter)
+      .select('_id username email profilePicture')
+      .skip(offset)
+      .limit(parsedLimit);
+
+    const usersCount = await User.countDocuments(searchFilter);
+
+    const { totalPages, hasNextPage, nextPage } = getPaginationResponse(
+      usersCount,
+      parsedLimit,
+      parsedPage
+    );
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalPages,
+        totalUsers: usersCount,
+        users,
+        currentPage: parsedPage,
+        nextPage,
+        hasNextPage,
+      },
+      message: 'Ok',
+    });
+  }
+);
+
+// @PATCH - private - /api/chats/:chatId/members
+export const addGroupMember = expressAsyncHandler(
+  async (req: IRequest, res: Response) => {}
 );

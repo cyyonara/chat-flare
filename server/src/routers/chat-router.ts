@@ -6,7 +6,10 @@ import {
   getChat,
   changeGroupChatPhoto,
   changeGroupName,
-} from '../controllers/chat.controller';
+  removeMember,
+  searchNonExistingGroupMember,
+  addGroupMember,
+} from '../controllers/chat-controller';
 
 const router = Router();
 
@@ -24,5 +27,14 @@ router.patch('/:chatId/chat-photo', verify, changeGroupChatPhoto);
 
 // @PATCH - private - /api/chats/:chatId/group-name
 router.patch('/:chatId/group-name', verify, changeGroupName);
+
+// @DELETE - private - /api/chats/:chatId/members/:userId
+router.delete('/:chatId/members/:userId', verify, removeMember);
+
+// @GET - private - /api/chats/:chatId/members/search?keyword=?&page=?&limit=?
+router.get('/:chatId/members/search', verify, searchNonExistingGroupMember);
+
+// @PATCH - private - /api/chats/:chatId/members
+router.patch('/:chatId/members', verify, addGroupMember);
 
 export default router;

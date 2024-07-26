@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { verify } from '../middlewares/verify';
-import { searchUser, updateProfilePicture } from '../controllers/user.controller';
+import { searchUser, updateProfilePicture } from '../controllers/user-controller';
 
 const router = Router();
 

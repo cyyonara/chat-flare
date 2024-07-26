@@ -58,7 +58,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
     searchResultContent = (
       <>
         {!data.pages[0].users.length ? (
-          <p className='text-center'>No users found</p>
+          <p className='text-center'>No users found.</p>
         ) : (
           data.pages.map((page) =>
             page.users.map((user) => (
@@ -108,7 +108,7 @@ export default function SearchUserModal({ closeModal }: IProps) {
         <Card>
           <CardHeader>
             <CardTitle>Search a user</CardTitle>
-            <CardDescription>Start talking with your friends</CardDescription>
+            <CardDescription>Start talking with other people</CardDescription>
           </CardHeader>
           <CardContent>
             <div className='flex flex-col gap-y-4'>

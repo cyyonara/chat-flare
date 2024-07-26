@@ -28,6 +28,6 @@ export const useSearchUsers = (
     queryFn: getUsers,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
-    enabled: keyword ? true : false,
+    enabled: keyword !== '',
   });
 };
