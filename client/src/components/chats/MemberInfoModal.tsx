@@ -12,6 +12,7 @@ interface IProps extends IUser {
   currentUserId: string;
   isAdmin: boolean;
   handleMessageUser: () => void;
+  handleRemoveMember: () => void;
   closeMemberInfoModal: () => void;
 }
 
@@ -23,6 +24,7 @@ export default function MemberInfoModal({
   currentUserId,
   isAdmin,
   handleMessageUser,
+  handleRemoveMember,
   closeMemberInfoModal,
 }: IProps) {
   return (
@@ -80,6 +82,7 @@ export default function MemberInfoModal({
                       <Button
                         variant="destructive"
                         className="size-[45px] rounded-full p-0 text-center"
+                        onClick={handleRemoveMember}
                       >
                         <IoPersonRemoveOutline size={20} />
                       </Button>

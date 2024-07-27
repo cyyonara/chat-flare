@@ -15,11 +15,18 @@ import { useRef, useState, useEffect, useCallback, ReactNode } from "react";
 import { useDebounce } from "@/hooks/states/useDebounce";
 import { useSearchNonExistingGroupMember } from "@/hooks/api/useSearchNonExistingGroupMember";
 import { useInView } from "react-intersection-observer";
-import { IUser } from "@/types";
+import { IChat, IUser } from "@/types";
 import SearchedGroupMember from "@/components/user/SearchedGroupMember";
 import UserResultSkeleton from "@/components/skeletons/UserResultSkeleton";
 import UserSearchError from "@/components/error/UserSearchError";
 import SelectedUser from "@/components/user/SelectedUser";
+import { useAddGroupMember } from "@/hooks/api/useAddGroupMember";
+import { useParams } from "react-router-dom";
+import { useLogout } from "@/hooks/api/useLogout";
+import { useAuth } from "@/hooks/states/useAuth";
+import { useToast } from "@/components/ui/use-toast";
+import { socket } from "@/components/providers/SocketProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IProps {
   closeAddMemberModal: () => void;
@@ -27,6 +34,7 @@ interface IProps {
 
 export default function AddMemberModal({ closeAddMemberModal }: IProps) {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
   const debounceValue = useDebounce(searchKeyword);
   const {
     data,
@@ -37,9 +45,14 @@ export default function AddMemberModal({ closeAddMemberModal }: IProps) {
     fetchNextPage,
     refetch,
   } = useSearchNonExistingGroupMember(debounceValue);
-  const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
+  const { mutate: addGroupMember, isPending } = useAddGroupMember();
+  const { mutate: logout } = useLogout();
+  const { chatId } = useParams();
   const { ref, inView } = useInView();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const clearCredentials = useAuth((state) => state.clearCredentials);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   let addMemberModalContent: ReactNode;
 
@@ -53,6 +66,31 @@ export default function AddMemberModal({ closeAddMemberModal }: IProps) {
 
   const handleAddMembers = () => {
     if (!selectedUsers.length) return;
+    addGroupMember(
+      { users: selectedUsers, chatId: chatId as string },
+      {
+        onSuccess: (data) => {
+          queryClient.setQueryData(["chats", chatId], (): IChat => data);
+          toast({
+            title: "Success!",
+            description: "Members successfully added.",
+          });
+          socket.emit("update-chat", data);
+          closeAddMemberModal();
+        },
+        onError: (error) => {
+          if (error.response?.status === 401) {
+            logout(null, { onSuccess: clearCredentials });
+          } else {
+            toast({
+              title: "Oops!",
+              description:
+                error.response?.data.message || "Something went wrong.",
+            });
+          }
+        },
+      },
+    );
   };
 
   if (isLoading || isFetching) {
@@ -145,6 +183,7 @@ export default function AddMemberModal({ closeAddMemberModal }: IProps) {
                     email={user.email}
                     profilePicture={user.profilePicture}
                     handleSelectedUsers={handleSelectedUsers}
+                    isLoading={isPending}
                   />
                 ))}
               </div>
@@ -156,7 +195,9 @@ export default function AddMemberModal({ closeAddMemberModal }: IProps) {
               Close
             </Button>
             <Button
-              disabled={searchKeyword === "" || selectedUsers.length < 1}
+              disabled={
+                searchKeyword === "" || selectedUsers.length < 1 || isPending
+              }
               onClick={handleAddMembers}
             >
               Add

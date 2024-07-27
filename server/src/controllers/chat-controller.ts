@@ -6,10 +6,12 @@ import {
   createChatSchema,
   newGroupChatPhotoSchema,
   groupNameSchema,
+  addGroupMemberSchema,
 } from '../utils/validations';
 import { User } from '../models/user-model';
 import { Message } from '../models/message-model';
 import { getPaginationResponse, parsePaginationData } from '../utils/helpers';
+import { Types } from 'mongoose';
 
 // @POST - private - /api/chats
 export const createChat = expressAsyncHandler(async (req: IRequest, res: Response) => {
@@ -350,5 +352,43 @@ export const searchNonExistingGroupMember = expressAsyncHandler(
 
 // @PATCH - private - /api/chats/:chatId/members
 export const addGroupMember = expressAsyncHandler(
-  async (req: IRequest, res: Response) => {}
+  async (req: IRequest, res: Response) => {
+    const { usersId } = addGroupMemberSchema.parse(req.body);
+    const { chatId } = req.params;
+
+    const chat = await Chat.findOne({
+      _id: chatId,
+      isGroupChat: true,
+      users: { $elemMatch: { user: req.user?._id } },
+    });
+
+    if (!chat) {
+      res.status(404);
+      throw new Error('Chat not found');
+    }
+
+    usersId.forEach((userId) => {
+      chat.users.push({ user: new Types.ObjectId(userId), hasLeft: false });
+    });
+
+    await chat.save({ timestamps: false });
+
+    await chat.populate({
+      path: 'chatCreator users.user',
+      select: '_id username email profilePicture',
+      model: User,
+    });
+
+    await chat.populate({
+      path: 'lastMessage',
+      model: Message,
+      populate: {
+        path: 'sender receivers.user reactors.user',
+        select: '_id username email profilePicture',
+        model: User,
+      },
+    });
+
+    res.status(200).json({ success: true, data: chat, message: 'Ok' });
+  }
 );

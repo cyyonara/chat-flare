@@ -1,6 +1,6 @@
-import { IChatUser } from '@/types';
-import Member from '@/components/chats/Member';
-import { useAuth } from '@/hooks/states/useAuth';
+import { IChatUser } from "@/types";
+import Member from "@/components/chats/Member";
+import { useAuth } from "@/hooks/states/useAuth";
 
 interface IProps {
   members: IChatUser[];
@@ -19,9 +19,9 @@ export default function Members({ members, groupAdminId }: IProps) {
   });
 
   return (
-    <div className='flex flex-col gap-y-2'>
-      <div className='text-muted-foreground text-sm'>Members</div>
-      <div className='flex flex-col gap-y-1 max-h-[400px] overflow-y-auto custom-scroll'>
+    <div className="flex flex-col gap-y-2">
+      <div className="text-sm text-muted-foreground">Members</div>
+      <div className="flex flex-col gap-y-1">
         {sortedMembers.map((member) => (
           <Member
             key={member._id}

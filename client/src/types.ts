@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { loginSchema, signupSchema } from './lib/schemas';
-import { AxiosError } from 'axios';
+import { z } from "zod";
+import { loginSchema, signupSchema } from "./lib/schemas";
+import { AxiosError } from "axios";
 
 export interface IRequestError extends AxiosError<{ message: string }> {}
 
@@ -145,6 +145,11 @@ export interface INewGroupName {
 export interface IRemoveMemberData {
   chatId: string;
   userId: string;
+}
+
+export interface IAddGroupMemberData {
+  chatId: string;
+  users: IUser[];
 }
 
 // store types
